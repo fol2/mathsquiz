@@ -1,8 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 
-interface DrawingCanvasProps {
-  // Empty interface since we're handling visibility at parent level
-}
+type DrawingCanvasProps = Record<string, never>; // No props needed
 
 const DrawingCanvas: React.FC<DrawingCanvasProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);

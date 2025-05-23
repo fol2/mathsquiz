@@ -228,7 +228,7 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ level, onClose }) => {
         {/* Motivation Quote */}
         <div className="mt-4 animate-slide-up" style={{ animationDelay: '1700ms' }}>
           <div className="text-sm text-indigo-300 italic">
-            "Mathematics is not about numbers, equations, or algorithms. It's about understanding." 
+            &ldquo;Mathematics is not about numbers, equations, or algorithms. It&apos;s about understanding.&rdquo;
           </div>
           <div className="text-xs text-indigo-400 mt-1">
             - William Paul Thurston
