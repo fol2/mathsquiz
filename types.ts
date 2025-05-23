@@ -44,11 +44,6 @@ export enum ProblemType {
   ERROR_GENERATING = 'ERROR_GENERATING', // Type for when AI fails
 }
 
-export interface APIKeyConfig {
-  apiKey: string;
-  isValid: boolean;
-}
-
 export interface QuestionBatch {
   questions: MathProblem[];
   level: DifficultyLevel;
