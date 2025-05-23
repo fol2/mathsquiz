@@ -1,5 +1,6 @@
 import { GoogleGenAI, GenerateContentResponse } from '@google/genai';
 import { MathProblem, DifficultyLevel, ProblemType, QuestionBatch } from '../types';
+import { TOTAL_QUESTIONS } from '../constants';
 
 // Storage key for persisting the API key in the browser
 const API_KEY_STORAGE_KEY = 'mathGeniusApiKey';
@@ -11,9 +12,45 @@ let ai: GoogleGenAI | null = null;
 // Question batches cache
 const questionBatches = new Map<DifficultyLevel, QuestionBatch>();
 
-// Batch size for API calls
-const BATCH_SIZE = 5;
+// Storage key for persisting unused batches
+const QUESTION_BATCH_STORAGE_KEY = 'mathGeniusBatches';
+
+// Batch size for API calls (tuned to serve an entire game cycle)
+const BATCH_SIZE = TOTAL_QUESTIONS;
 const BATCH_EXPIRY_TIME = 5 * 60 * 1000; // 5 minutes
+
+const saveQuestionBatchesToStorage = (): void => {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    const obj: Record<number, QuestionBatch> = {};
+    questionBatches.forEach((batch, lvl) => {
+      obj[lvl] = batch;
+    });
+    localStorage.setItem(QUESTION_BATCH_STORAGE_KEY, JSON.stringify(obj));
+  } catch (e) {
+    console.warn('Failed to save question batches:', e);
+  }
+};
+
+const loadQuestionBatchesFromStorage = (): void => {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    const saved = localStorage.getItem(QUESTION_BATCH_STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved) as Record<string, QuestionBatch>;
+      Object.entries(parsed).forEach(([lvl, batch]) => {
+        if (batch && Array.isArray(batch.questions)) {
+          questionBatches.set(Number(lvl) as DifficultyLevel, batch);
+        }
+      });
+    }
+  } catch (e) {
+    console.warn('Failed to load question batches:', e);
+  }
+};
+
+// Load persisted batches on module initialization
+loadQuestionBatchesFromStorage();
 
 export const setApiKey = (apiKey: string, persist = true): boolean => {
   try {
@@ -22,6 +59,7 @@ export const setApiKey = (apiKey: string, persist = true): boolean => {
       ai = new GoogleGenAI({ apiKey: userApiKey });
       // Clear existing batches when API key changes
       questionBatches.clear();
+      saveQuestionBatchesToStorage();
       if (persist && typeof localStorage !== 'undefined') {
         try {
           localStorage.setItem(API_KEY_STORAGE_KEY, userApiKey);
@@ -87,6 +125,7 @@ export const clearStoredApiKey = (): void => {
   userApiKey = null;
   ai = null;
   questionBatches.clear();
+  saveQuestionBatchesToStorage();
 };
 
 export const hasValidApiKey = (): boolean => {
@@ -285,6 +324,7 @@ const getFromBatch = (level: DifficultyLevel): MathProblem | null => {
   // Check if batch is expired
   if (Date.now() - batch.timestamp > BATCH_EXPIRY_TIME) {
     questionBatches.delete(level);
+    saveQuestionBatchesToStorage();
     return null;
   }
   
@@ -292,9 +332,12 @@ const getFromBatch = (level: DifficultyLevel): MathProblem | null => {
   const question = batch.questions.shift();
   if (!question) {
     questionBatches.delete(level);
+    saveQuestionBatchesToStorage();
     return null;
   }
-  
+
+  saveQuestionBatchesToStorage();
+
   return question;
 };
 
@@ -304,6 +347,7 @@ const prefetchBatch = async (level: DifficultyLevel): Promise<void> => {
   try {
     const batch = await generateQuestionBatch(level);
     questionBatches.set(level, batch);
+    saveQuestionBatchesToStorage();
     console.log(`Prefetched batch of ${batch.questions.length} questions for level ${level}`);
   } catch (error) {
     console.error(`Failed to prefetch batch for level ${level}:`, error);
@@ -337,6 +381,7 @@ export const generateProblem = async (level: DifficultyLevel): Promise<MathProbl
     // Store remaining questions
     if (batch.questions.length > 0) {
       questionBatches.set(level, batch);
+      saveQuestionBatchesToStorage();
     }
     
     return question;
@@ -349,4 +394,5 @@ export const generateProblem = async (level: DifficultyLevel): Promise<MathProbl
 // Clear all cached batches (useful when changing API keys or restarting)
 export const clearQuestionCache = (): void => {
   questionBatches.clear();
+  saveQuestionBatchesToStorage();
 };
