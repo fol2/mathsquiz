@@ -1,4 +1,4 @@
-const CACHE_NAME = 'math-genius-v1';
+const CACHE_NAME = 'math-genius-v2-' + Date.now();
 
 // Files that should be pre-cached during the install step.  At runtime the
 // service worker will also cache any built assets under /assets/ as they are
