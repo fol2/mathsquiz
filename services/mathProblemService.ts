@@ -98,7 +98,7 @@ Now, generate a new problem.
         }
     });
     
-    let jsonStr = response.text.trim();
+    let jsonStr = response.text?.trim() || '';
     // Remove markdown fences if present (Gemini might sometimes add them)
     const fenceRegex = /^```(\w*)?\s*\n?(.*?)\n?\s*```$/s;
     const match = jsonStr.match(fenceRegex);

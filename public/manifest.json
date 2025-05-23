@@ -1,0 +1,20 @@
+{
+  "name": "Math Genius Challenge",
+  "short_name": "MathGenius",
+  "description": "Challenge yourself with AI-generated math problems. Progressive difficulty levels from basic arithmetic to advanced algebra.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#3b82f6",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["education", "games", "utilities"],
+  "lang": "en",
+  "scope": "/"
+} 

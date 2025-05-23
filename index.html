@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Math Genius Challenge</title>
+    <meta name="description" content="Challenge yourself with AI-generated math problems. Progressive difficulty levels from basic arithmetic to advanced algebra.">
+    <meta name="theme-color" content="#3b82f6">
+    <link rel="manifest" href="/manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       /* Custom font for a more playful/educational feel */
@@ -54,5 +57,20 @@
     <audio id="levelUpSound" src="/sounds/level_up.mp3" preload="auto"></audio>
 
     <script type="module" src="/index.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
   </body>
 </html>

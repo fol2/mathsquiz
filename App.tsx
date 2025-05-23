@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { GameState, MathProblem, DifficultyLevel, ProblemType } from './types';
 import { generateProblem } from './services/mathProblemService';
@@ -7,8 +6,10 @@ import StartScreen from './components/StartScreen';
 import GameScreen from './components/GameScreen';
 import GameOverScreen from './components/GameOverScreen';
 import LevelUpModal from './components/LevelUpModal';
+import ErrorBoundary from './components/ErrorBoundary';
+import { useGameProgress } from './hooks/useGameProgress';
 
-const App = (): JSX.Element => {
+const App = (): React.JSX.Element => {
   const [gameState, setGameState] = useState<GameState>(GameState.NOT_STARTED);
   const [currentLevel, setCurrentLevel] = useState<DifficultyLevel>(STARTING_LEVEL);
   const [currentProblem, setCurrentProblem] = useState<MathProblem | null>(null);
@@ -21,9 +22,13 @@ const App = (): JSX.Element => {
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState<boolean>(false);
   const [correctSoundIndex, setCorrectSoundIndex] = useState<number>(0);
   const [isLoadingProblem, setIsLoadingProblem] = useState<boolean>(false);
+  const [correctAnswersCount, setCorrectAnswersCount] = useState<number>(0);
+  const [gameStartTime, setGameStartTime] = useState<number>(0);
 
   const [nextProblemBuffer, setNextProblemBuffer] = useState<MathProblem | null>(null);
   const [isPrefetching, setIsPrefetching] = useState<boolean>(false);
+
+  const { progress, updateGameEnd } = useGameProgress();
 
   const playSound = (soundId: string) => {
     const sound = document.getElementById(soundId) as HTMLAudioElement;
@@ -77,6 +82,12 @@ const App = (): JSX.Element => {
     setFeedbackMessage('');
     
     if (questionsAttempted >= TOTAL_QUESTIONS) {
+      // Save game progress before ending
+      const gameEndTime = Date.now();
+      const totalGameTime = gameEndTime - gameStartTime;
+      const averageTimePerQuestion = totalGameTime / TOTAL_QUESTIONS / 1000; // in seconds
+      
+      updateGameEnd(score, currentLevel, correctAnswersCount, averageTimePerQuestion);
       setGameState(GameState.GAME_OVER);
       return;
     }
@@ -89,21 +100,27 @@ const App = (): JSX.Element => {
       if (nextProblemBuffer && nextProblemBuffer.difficulty === currentLevel) {
         problemToSet = nextProblemBuffer;
         setNextProblemBuffer(null);
-        console.log("Loaded problem from PREFETCH BUFFER.", problemToSet);
+        if (process.env.NODE_ENV === 'development') {
+          console.log("Loaded problem from PREFETCH BUFFER.", problemToSet);
+        }
       } else {
         if (nextProblemBuffer && nextProblemBuffer.difficulty !== currentLevel) {
-            console.log("Prefetch buffer had problem for different level, fetching new.");
+            if (process.env.NODE_ENV === 'development') {
+              console.log("Prefetch buffer had problem for different level, fetching new.");
+            }
             setNextProblemBuffer(null); // Discard old buffer
         }
         problemToSet = await generateProblem(currentLevel);
-        console.log(
-            problemToSet.problemType === ProblemType.AI_GENERATED 
-                ? "Loaded problem from AI." 
-                : problemToSet.problemType === ProblemType.ERROR_GENERATING 
-                    ? "Loaded problem: FALLBACK (AI error)."
-                    : "Loaded problem from local static generator (should not happen with AI setup).",
-            problemToSet
-        );
+        if (process.env.NODE_ENV === 'development') {
+          console.log(
+              problemToSet.problemType === ProblemType.AI_GENERATED 
+                  ? "Loaded problem from AI." 
+                  : problemToSet.problemType === ProblemType.ERROR_GENERATING 
+                      ? "Loaded problem: FALLBACK (AI error)."
+                      : "Loaded problem from local static generator (should not happen with AI setup).",
+              problemToSet
+          );
+        }
       }
       
       setCurrentProblem(problemToSet);
@@ -142,6 +159,7 @@ const App = (): JSX.Element => {
     let leveledUp = false;
     if (isCorrect) {
       setScore(prevScore => prevScore + 10 * currentLevel);
+      setCorrectAnswersCount(prev => prev + 1);
       setStrikes(prevStrikes => {
         const newStrikes = prevStrikes + 1;
         if (newStrikes >= STRIKES_TO_LEVEL_UP && currentLevel < MAX_LEVEL) {
@@ -193,6 +211,7 @@ const App = (): JSX.Element => {
     if (gameState === GameState.PLAYING && !isAnswerSubmitted && !isLoadingProblem && currentProblem?.problemType !== ProblemType.ERROR_GENERATING) {
       if (timeLeft <= 0) {
         handleAnswerSubmit('TIMEOUT_SUBMIT'); 
+        return;
       } else {
         const timerId = setInterval(() => {
           setTimeLeft(prevTime => prevTime - 1);
@@ -200,6 +219,7 @@ const App = (): JSX.Element => {
         return () => clearInterval(timerId);
       }
     }
+    return undefined;
   }, [gameState, timeLeft, isAnswerSubmitted, handleAnswerSubmit, isLoadingProblem, currentProblem]);
 
 
@@ -208,6 +228,8 @@ const App = (): JSX.Element => {
     setStrikes(0);
     setCurrentLevel(STARTING_LEVEL);
     setQuestionsAttempted(0); 
+    setCorrectAnswersCount(0);
+    setGameStartTime(Date.now());
     setGameState(GameState.PLAYING);
     setCorrectSoundIndex(0); 
     setNextProblemBuffer(null); // Clear buffer for a fresh game
@@ -229,36 +251,40 @@ const App = (): JSX.Element => {
     setIsAnswerSubmitted(false);
     setIsLoadingProblem(false);
     setQuestionsAttempted(0); 
+    setCorrectAnswersCount(0);
+    setGameStartTime(0);
     setNextProblemBuffer(null); // Clear buffer
     setIsPrefetching(false); 
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 text-white select-none">
-      {showLevelUpModal && <LevelUpModal level={currentLevel} onClose={closeLevelUpModal} />}
-      
-      {gameState === GameState.NOT_STARTED && <StartScreen onStart={startGame} />}
-      
-      {gameState === GameState.PLAYING && (
-        <GameScreen
-          problem={currentProblem}
-          level={currentLevel}
-          score={score}
-          strikes={strikes}
-          timeLeft={timeLeft}
-          questionsAttempted={questionsAttempted}
-          totalQuestions={TOTAL_QUESTIONS}
-          feedbackMessage={feedbackMessage}
-          isAnswerSubmitted={isAnswerSubmitted}
-          onAnswerSubmit={handleAnswerSubmit}
-          isLoadingProblem={isLoadingProblem}
-        />
-      )}
-      
-      {gameState === GameState.GAME_OVER && (
-        <GameOverScreen score={score} level={currentLevel} onRestart={restartGame} />
-      )}
-    </div>
+    <ErrorBoundary>
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 text-white select-none">
+        {showLevelUpModal && <LevelUpModal level={currentLevel} onClose={closeLevelUpModal} />}
+        
+        {gameState === GameState.NOT_STARTED && <StartScreen onStart={startGame} />}
+        
+        {gameState === GameState.PLAYING && (
+          <GameScreen
+            problem={currentProblem}
+            level={currentLevel}
+            score={score}
+            strikes={strikes}
+            timeLeft={timeLeft}
+            questionsAttempted={questionsAttempted}
+            totalQuestions={TOTAL_QUESTIONS}
+            feedbackMessage={feedbackMessage}
+            isAnswerSubmitted={isAnswerSubmitted}
+            onAnswerSubmit={handleAnswerSubmit}
+            isLoadingProblem={isLoadingProblem}
+          />
+        )}
+        
+        {gameState === GameState.GAME_OVER && (
+          <GameOverScreen score={score} level={currentLevel} onRestart={restartGame} progress={progress} />
+        )}
+      </div>
+    </ErrorBoundary>
   );
 };
 

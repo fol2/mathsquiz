@@ -1,8 +1,8 @@
-
-import React, { useState, useEffect, FormEvent } from 'react';
+import React, { useState, useEffect, FormEvent, memo, useCallback } from 'react';
 import { MathProblem, DifficultyLevel, ProblemType } from '../types';
 import { DIFFICULTY_NAMES, TOTAL_QUESTIONS } from '../constants';
 import { TimerIcon, CheckCircleIcon, XCircleIcon, SparklesIcon, StarIcon, TrendingUpIcon, AlertTriangleIcon } from './Icons'; // Added AlertTriangleIcon
+import LoadingSpinner from './LoadingSpinner';
 
 interface GameScreenProps {
   problem: MathProblem | null; // Problem can be null initially or during loading/error
@@ -18,7 +18,7 @@ interface GameScreenProps {
   isLoadingProblem: boolean;
 }
 
-const GameScreen: React.FC<GameScreenProps> = ({
+const GameScreen: React.FC<GameScreenProps> = memo(({
   problem,
   level,
   score,
@@ -43,12 +43,35 @@ const GameScreen: React.FC<GameScreenProps> = ({
     }
   }, [problem, isAnswerSubmitted, isLoadingProblem]);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isAnswerSubmitted || isLoadingProblem || !problem || problem.problemType === ProblemType.ERROR_GENERATING) {
+        return;
+      }
+      
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setUserAnswer('');
+        const inputElement = document.getElementById('answer-input') as HTMLInputElement;
+        inputElement?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isAnswerSubmitted, isLoadingProblem, problem]);
+
+  const handleSubmit = useCallback((e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     if (!isAnswerSubmitted && !isLoadingProblem && problem && problem.problemType !== ProblemType.ERROR_GENERATING) {
       onAnswerSubmit(userAnswer);
     }
-  };
+  }, [isAnswerSubmitted, isLoadingProblem, problem, userAnswer, onAnswerSubmit]);
+
+  const handleAnswerChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserAnswer(e.target.value);
+  }, []);
 
   const progressPercentage = (Math.max(0, questionsAttempted -1) / totalQuestions) * 100; // Adjust for 1-based display
   const isFeedbackPositive = feedbackMessage.includes('Awesome') || feedbackMessage.includes('Great') || feedbackMessage.includes('Fantastic') || feedbackMessage.includes('Super') || feedbackMessage.includes('LEVEL UP');
@@ -59,8 +82,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
   if (isLoadingProblem && !problem) {
     return (
       <div className="w-full max-w-2xl mx-auto bg-white/20 backdrop-blur-xl shadow-2xl rounded-xl p-6 md:p-8 flex flex-col items-center justify-center space-y-6 min-h-[400px]">
-        <SparklesIcon className="w-16 h-16 text-yellow-300 animate-spin" />
-        <p className="text-2xl font-semibold text-white">Generating a new challenge...</p>
+        <LoadingSpinner message="Generating a new challenge..." size="large" />
       </div>
     );
   }
@@ -109,7 +131,9 @@ const GameScreen: React.FC<GameScreenProps> = ({
                 <p className="text-sm">A new question will be fetched shortly.</p>
             </div>
         ) : problem ? (
-          <p className="text-2xl md:text-3xl font-bold text-white break-words">{problem.questionText}</p>
+          <p id="question-text" className="text-2xl md:text-3xl font-bold text-white break-words" role="heading" aria-level={2}>
+            {problem.questionText}
+          </p>
         ) : (
            <p className="text-xl font-semibold text-gray-400">Waiting for problem...</p>
         )}
@@ -122,16 +146,19 @@ const GameScreen: React.FC<GameScreenProps> = ({
           type="number"
           step="any"
           value={userAnswer}
-          onChange={(e) => setUserAnswer(e.target.value)}
+          onChange={handleAnswerChange}
           placeholder="Your Answer"
           disabled={isAnswerSubmitted || isLoadingProblem || !problem || problem.problemType === ProblemType.ERROR_GENERATING}
           className="w-full p-4 text-2xl text-center text-gray-800 rounded-lg border-2 border-transparent focus:border-sky-400 focus:ring-2 focus:ring-sky-300 outline-none transition-all disabled:bg-gray-700/50 disabled:text-gray-100 disabled:cursor-not-allowed"
           autoFocus={!isLoadingProblem && problem?.problemType !== ProblemType.ERROR_GENERATING}
+          aria-label="Enter your answer to the math problem"
+          aria-describedby="question-text"
         />
         <button
           type="submit"
           disabled={isAnswerSubmitted || userAnswer.trim() === '' || isLoadingProblem || !problem || problem.problemType === ProblemType.ERROR_GENERATING}
           className="w-full bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white font-bold py-4 px-6 rounded-lg text-xl shadow-md transform transition-transform duration-150 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          aria-label="Submit your answer"
         >
           {isAnswerSubmitted ? 'Waiting...' : 'Submit Answer'}
         </button>
@@ -146,6 +173,6 @@ const GameScreen: React.FC<GameScreenProps> = ({
       )}
     </div>
   );
-};
+});
 
 export default GameScreen;
