@@ -216,9 +216,6 @@ const App = (): React.JSX.Element => {
     return undefined;
   }, [gameState, timeLeft, isAnswerSubmitted, handleAnswerSubmit, isLoadingProblem, currentProblem]);
 
-  const handleApiKeySetup = useCallback(() => {
-    setGameState(GameState.NOT_STARTED);
-  }, []);
 
   const startGame = async (): Promise<void> => {
     setScore(0);

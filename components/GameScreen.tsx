@@ -1,6 +1,6 @@
 import React, { useState, useEffect, FormEvent, memo, useCallback } from 'react';
 import { MathProblem, DifficultyLevel, ProblemType } from '../types';
-import { DIFFICULTY_NAMES, TOTAL_QUESTIONS } from '../constants';
+import { DIFFICULTY_NAMES } from '../constants';
 import { TimerIcon, CheckCircleIcon, XCircleIcon, SparklesIcon, StarIcon, TrendingUpIcon, AlertTriangleIcon } from './Icons';
 import LoadingSpinner from './LoadingSpinner';
 import MathRenderer from './MathRenderer';
@@ -44,8 +44,7 @@ const ProgressIndicator: React.FC<{
   current: number;
   total: number;
   strikes: number;
-  level: DifficultyLevel;
-}> = ({ current, total, strikes, level }) => {
+}> = ({ current, total, strikes }) => {
   const progressPercentage = (Math.max(0, current - 1) / total) * 100;
   const strikesPercentage = (strikes / 3) * 100;
 
@@ -136,6 +135,7 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
         }
       };
     }
+    return undefined;
   }, [isAnswerSubmitted]);
 
   useEffect(() => {
@@ -215,6 +215,7 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
         return () => clearTimeout(timer);
       }
     }
+    return undefined;
   }, [isAnswerSubmitted, feedbackMessage]);
 
   // Keyboard shortcuts
@@ -344,7 +345,6 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
               current={questionsAttempted}
               total={totalQuestions}
               strikes={strikes}
-              level={level}
             />
           </div>
         </div>

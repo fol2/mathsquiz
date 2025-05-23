@@ -76,8 +76,7 @@ const PerformanceChart: React.FC<{
   level: DifficultyLevel;
   score: number;
   accuracy: number;
-  questions: number;
-}> = ({ level, score, accuracy, questions }) => {
+}> = ({ level, score, accuracy }) => {
   const maxScore = TOTAL_QUESTIONS * 10 * 5; // Max possible score
   const scorePercentage = (score / maxScore) * 100;
 
@@ -133,7 +132,6 @@ const PerformanceChart: React.FC<{
 };
 
 const GameOverScreen: React.FC<GameOverScreenProps> = ({ finalScore, finalLevel, totalQuestions, correctAnswersCount, onRestart, progress }) => {
-  const [showCelebration, setShowCelebration] = useState(true);
   const [currentQuote, setCurrentQuote] = useState(0);
   const [showDetails, setShowDetails] = useState(false);
 
@@ -189,16 +187,11 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ finalScore, finalLevel,
   const gameRating = accuracy >= 90 ? "Excellent!" : accuracy >= 75 ? "Great!" : accuracy >= 60 ? "Good!" : "Keep Practicing!";
 
   useEffect(() => {
-    const celebrationTimer = setTimeout(() => {
-      setShowCelebration(false);
-    }, 3000);
-
     const quoteInterval = setInterval(() => {
       setCurrentQuote((prev) => (prev + 1) % motivationalQuotes.length);
     }, 3000);
 
     return () => {
-      clearTimeout(celebrationTimer);
       clearInterval(quoteInterval);
     };
   }, [motivationalQuotes.length]);
@@ -278,7 +271,6 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ finalScore, finalLevel,
         level={finalLevel}
         score={finalScore}
         accuracy={accuracy}
-        questions={totalQuestions}
       />
 
       {/* Achievements Section */}
