@@ -1,11 +1,10 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 
 interface DrawingCanvasProps {
-  isVisible: boolean;
-  onToggle: () => void;
+  // Empty interface since we're handling visibility at parent level
 }
 
-const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ isVisible, onToggle }) => {
+const DrawingCanvas: React.FC<DrawingCanvasProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentColor, setCurrentColor] = useState('#ffffff');
@@ -128,87 +127,62 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ isVisible, onToggle }) =>
     };
   }, [startDrawing, draw, stopDrawing]);
 
-  if (!isVisible) return null;
-
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-xl p-4 w-full max-w-2xl max-h-[90vh] overflow-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-bold text-white">📝 Scratch Pad</h3>
-          <button
-            onClick={onToggle}
-            className="text-gray-400 hover:text-white text-2xl"
-            aria-label="Close drawing canvas"
-          >
-            ✕
-          </button>
+    <div className="bg-gray-800 p-4 w-full max-h-[70vh] overflow-auto">
+      <div className="bg-[#1a1a2e] rounded-lg p-3 mb-4">
+        <canvas
+          ref={canvasRef}
+          width={600}
+          height={400}
+          className="w-full border border-gray-600 rounded cursor-crosshair touch-none"
+          style={{ maxHeight: '300px' }}
+        />
+      </div>
+
+      <div className="space-y-4">
+        {/* Color Palette */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Color:
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {colors.map((color) => (
+              <button
+                key={color}
+                onClick={() => setCurrentColor(color)}
+                className={`w-8 h-8 rounded-full border-2 transition-all touch-target ${
+                  currentColor === color ? 'border-white scale-110' : 'border-gray-500 hover:scale-105'
+                }`}
+                style={{ backgroundColor: color }}
+                aria-label={`Select ${color} color`}
+              />
+            ))}
+          </div>
         </div>
 
-        <div className="bg-[#1a1a2e] rounded-lg p-2 mb-4">
-          <canvas
-            ref={canvasRef}
-            width={600}
-            height={400}
-            className="w-full border border-gray-600 rounded cursor-crosshair touch-none"
-            style={{ maxHeight: '300px' }}
+        {/* Brush Size */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Brush Size: {brushSize}px
+          </label>
+          <input
+            type="range"
+            min="1"
+            max="20"
+            value={brushSize}
+            onChange={(e) => setBrushSize(Number(e.target.value))}
+            className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
           />
         </div>
 
-        <div className="space-y-4">
-          {/* Color Palette */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Color:
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {colors.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => setCurrentColor(color)}
-                  className={`w-8 h-8 rounded-full border-2 ${
-                    currentColor === color ? 'border-white' : 'border-gray-500'
-                  }`}
-                  style={{ backgroundColor: color }}
-                  aria-label={`Select ${color} color`}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Brush Size */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Brush Size: {brushSize}px
-            </label>
-            <input
-              type="range"
-              min="1"
-              max="20"
-              value={brushSize}
-              onChange={(e) => setBrushSize(Number(e.target.value))}
-              className="w-full"
-            />
-          </div>
-
-          {/* Controls */}
-          <div className="flex gap-2">
-            <button
-              onClick={clearCanvas}
-              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors"
-            >
-              Clear
-            </button>
-            <button
-              onClick={onToggle}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors"
-            >
-              Done
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-4 text-xs text-gray-400 text-center">
-          Use this space to work out calculations, draw diagrams, or jot down notes
+        {/* Controls */}
+        <div className="flex gap-2">
+          <button
+            onClick={clearCanvas}
+            className="flex-1 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold py-3 px-4 rounded-lg transition-all touch-target-comfortable"
+          >
+            🗑️ Clear Canvas
+          </button>
         </div>
       </div>
     </div>

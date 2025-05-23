@@ -258,14 +258,16 @@ const App = (): React.JSX.Element => {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 text-white select-none">
-        {showLevelUpModal && <LevelUpModal level={currentLevel} onClose={closeLevelUpModal} />}
-        
+      <div className="min-h-screen flex items-center justify-center p-4 mobile-container keyboard-aware">
         {gameState === GameState.API_KEY_SETUP && (
-          <ApiKeySetup onComplete={handleApiKeySetup} />
+          <ApiKeySetup onComplete={() => setGameState(GameState.NOT_STARTED)} />
         )}
         
-        {gameState === GameState.NOT_STARTED && <StartScreen onStart={startGame} />}
+        {gameState === GameState.NOT_STARTED && (
+          <StartScreen 
+            onStart={startGame}
+          />
+        )}
         
         {gameState === GameState.PLAYING && (
           <GameScreen
@@ -287,8 +289,28 @@ const App = (): React.JSX.Element => {
         )}
         
         {gameState === GameState.GAME_OVER && (
-          <GameOverScreen score={score} level={currentLevel} onRestart={restartGame} progress={progress} />
+          <GameOverScreen
+            finalScore={score}
+            finalLevel={currentLevel}
+            totalQuestions={questionsAttempted}
+            onRestart={restartGame}
+            correctAnswersCount={correctAnswersCount}
+            progress={progress}
+          />
         )}
+
+        {showLevelUpModal && (
+          <LevelUpModal 
+            level={currentLevel}
+            onClose={closeLevelUpModal}
+          />
+        )}
+
+        {/* PWA Install Prompt for mobile users */}
+        <div className="sr-only">
+          <h1>Math Genius Challenge - AI-Powered Math Quiz Game</h1>
+          <p>Challenge yourself with progressive difficulty levels and AI-generated math problems</p>
+        </div>
       </div>
     </ErrorBoundary>
   );

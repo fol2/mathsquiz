@@ -3,26 +3,20 @@ import { DifficultyLevel } from '../types';
 import { DIFFICULTY_NAMES, TOTAL_QUESTIONS } from '../constants';
 import { TrophyIcon, RefreshIcon, StarIcon, SparklesIcon, TrendingUpIcon } from './Icons';
 
+// Import the GameProgress type from the hook to avoid conflicts
 interface GameProgress {
-  gamesPlayed: number;
-  totalScore: number;
   highScore: number;
-  averageScore: number;
-  accuracyRate: number;
-  averageLevel: number;
-  lastPlayedDate: string;
-  totalQuestionsAnswered: number;
-  correctAnswers: number;
-  streak: number;
-  bestStreak: number;
-  fastestAnswer: number;
-  levelProgression: { [key: number]: number };
-  achievements: string[];
+  bestLevel: DifficultyLevel;
+  gamesPlayed: number;
+  totalCorrectAnswers: number;
+  averageTime: number;
 }
 
 interface GameOverScreenProps {
-  score: number;
-  level: DifficultyLevel;
+  finalScore: number;
+  finalLevel: DifficultyLevel;
+  totalQuestions: number;
+  correctAnswersCount: number;
   onRestart: () => void;
   progress: GameProgress;
 }
@@ -138,7 +132,7 @@ const PerformanceChart: React.FC<{
   );
 };
 
-const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, level, onRestart, progress }) => {
+const GameOverScreen: React.FC<GameOverScreenProps> = ({ finalScore, finalLevel, totalQuestions, correctAnswersCount, onRestart, progress }) => {
   const [showCelebration, setShowCelebration] = useState(true);
   const [currentQuote, setCurrentQuote] = useState(0);
   const [showDetails, setShowDetails] = useState(false);
@@ -150,9 +144,7 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, level, onRestart
     "Practice makes progress! Keep going! 🚀"
   ];
 
-  const accuracy = progress.totalQuestionsAnswered > 0 
-    ? (progress.correctAnswers / progress.totalQuestionsAnswered) * 100 
-    : 0;
+  const accuracy = correctAnswersCount > 0 ? (correctAnswersCount / totalQuestions) * 100 : 0;
 
   const achievements = [
     {
@@ -165,7 +157,7 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, level, onRestart
       icon: "🔥",
       title: "Streak Master",
       description: "Get 5+ correct in a row",
-      unlocked: progress.bestStreak >= 5
+      unlocked: progress.bestLevel === finalLevel && progress.gamesPlayed >= 5
     },
     {
       icon: "🏆",
@@ -177,23 +169,23 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, level, onRestart
       icon: "⚡",
       title: "Speed Demon",
       description: "Answer in under 5 seconds",
-      unlocked: progress.fastestAnswer < 5 && progress.fastestAnswer > 0
+      unlocked: progress.averageTime < 5 && progress.averageTime > 0
     },
     {
       icon: "🧠",
       title: "Math Genius",
       description: "Reach Level 5",
-      unlocked: progress.averageLevel >= 5
+      unlocked: finalLevel === 5
     },
     {
       icon: "💎",
       title: "Perfectionist",
       description: "95%+ accuracy",
-      unlocked: accuracy >= 95 && progress.totalQuestionsAnswered >= 20
+      unlocked: accuracy >= 95 && correctAnswersCount >= 20
     }
   ];
 
-  const isNewHighScore = score === progress.highScore && score > 0;
+  const isNewHighScore = finalScore === progress.highScore && finalScore > 0;
   const gameRating = accuracy >= 90 ? "Excellent!" : accuracy >= 75 ? "Great!" : accuracy >= 60 ? "Good!" : "Keep Practicing!";
 
   useEffect(() => {
@@ -249,7 +241,7 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, level, onRestart
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           title="Final Score"
-          value={score.toLocaleString()}
+          value={finalScore.toLocaleString()}
           {...(isNewHighScore ? { subtitle: "New Record!" } : {})}
           icon={<StarIcon className="w-8 h-8" />}
           color={isNewHighScore ? "border-yellow-400/50 bg-yellow-500/10" : ""}
@@ -257,8 +249,8 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, level, onRestart
         />
         <StatCard
           title="Level Reached"
-          value={level}
-          subtitle={DIFFICULTY_NAMES[level]}
+          value={finalLevel}
+          subtitle={DIFFICULTY_NAMES[finalLevel]}
           icon={<TrendingUpIcon className="w-8 h-8" />}
           color="text-yellow-300"
           delay={400}
@@ -266,7 +258,7 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, level, onRestart
         <StatCard
           title="Accuracy"
           value={`${accuracy.toFixed(1)}%`}
-          subtitle={`${progress.correctAnswers}/${progress.totalQuestionsAnswered || TOTAL_QUESTIONS} correct`}
+          subtitle={`${correctAnswersCount}/${totalQuestions} correct`}
           icon={<div className="text-2xl">🎯</div>}
           color="text-blue-300"
           delay={600}
@@ -283,10 +275,10 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, level, onRestart
 
       {/* Performance Chart */}
       <PerformanceChart
-        level={level}
-        score={score}
+        level={finalLevel}
+        score={finalScore}
         accuracy={accuracy}
-        questions={progress.totalQuestionsAnswered || TOTAL_QUESTIONS}
+        questions={totalQuestions}
       />
 
       {/* Achievements Section */}
@@ -336,16 +328,16 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, level, onRestart
               <div className="text-sm text-indigo-200">Games Played</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-300">{progress.averageScore.toFixed(0)}</div>
-              <div className="text-sm text-indigo-200">Average Score</div>
+              <div className="text-2xl font-bold text-blue-300">{progress.totalCorrectAnswers}</div>
+              <div className="text-sm text-indigo-200">Total Correct Answers</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-orange-300">{progress.bestStreak}</div>
-              <div className="text-sm text-indigo-200">Best Streak</div>
+              <div className="text-2xl font-bold text-orange-300">{progress.bestLevel}</div>
+              <div className="text-sm text-indigo-200">Best Level</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-300">{progress.averageLevel.toFixed(1)}</div>
-              <div className="text-sm text-indigo-200">Average Level</div>
+              <div className="text-2xl font-bold text-purple-300">{progress.averageTime.toFixed(1)}</div>
+              <div className="text-sm text-indigo-200">Average Time</div>
             </div>
           </div>
         )}

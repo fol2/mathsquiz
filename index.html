@@ -2,15 +2,14 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#667eea" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, viewport-fit=cover" />
     <title>Math Genius Challenge</title>
     <!-- Cache buster: 2025-01-23T03:35:00Z -->
     <meta name="description" content="Challenge yourself with AI-generated math problems. Progressive difficulty levels from basic arithmetic to advanced algebra.">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
     <link rel="manifest" href="/manifest.json">
     
     <!-- Google Fonts -->
@@ -31,6 +30,39 @@
   }
 }
 </script>
+
+    <!-- Mobile keyboard optimization script -->
+    <script>
+      // Handle virtual keyboard and viewport optimization
+      (function() {
+        // Set CSS custom properties for 100vh fallback handling
+        function setVHProperty() {
+          const vh = window.innerHeight * 0.01;
+          document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        
+        // Initial setup
+        setVHProperty();
+        
+        // Update on resize and orientation change
+        window.addEventListener('resize', setVHProperty);
+        window.addEventListener('orientationchange', () => {
+          setTimeout(setVHProperty, 100);
+        });
+        
+        // Visual Viewport API support for better keyboard handling
+        if (window.visualViewport) {
+          function updateViewport() {
+            const vvh = window.visualViewport.height * 0.01;
+            document.documentElement.style.setProperty('--vvh', `${vvh}px`);
+            document.documentElement.style.setProperty('--keyboard-height', `${window.innerHeight - window.visualViewport.height}px`);
+          }
+          
+          updateViewport();
+          window.visualViewport.addEventListener('resize', updateViewport);
+        }
+      })();
+    </script>
   </head>
   <body class="dark:bg-gradient-to-br dark:from-sky-900 dark:to-indigo-900 light:bg-gradient-to-br light:from-sky-200 light:to-indigo-300 transition-all duration-300">
     <div id="root"></div>

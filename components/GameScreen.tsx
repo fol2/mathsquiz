@@ -31,16 +31,11 @@ const StatCard: React.FC<{
   color: string;
   animate?: boolean;
 }> = ({ icon, label, value, color, animate = false }) => (
-  <div className={`glass-card p-3 md:p-2 rounded-lg card-hover flex items-center justify-between md:justify-start md:space-x-2 ${animate ? 'animate-number-pop' : ''}`}>
-    <div className="flex items-center space-x-2 md:space-x-2">
-      <div className={`text-lg ${color}`}>{icon}</div>
-      <div className="md:block">
-        <div className={`text-sm md:text-sm font-bold ${color}`}>{value}</div>
-        <div className="text-xs text-indigo-200 font-medium">{label}</div>
-      </div>
-    </div>
-    <div className="block md:hidden">
-      <div className={`text-lg font-bold ${color}`}>{value}</div>
+  <div className={`glass-card p-2 sm:p-3 rounded-lg card-hover flex items-center space-x-2 touch-target ${animate ? 'animate-number-pop' : ''}`}>
+    <div className={`text-lg sm:text-xl ${color}`}>{icon}</div>
+    <div className="min-w-0 flex-1">
+      <div className={`text-sm sm:text-base font-bold ${color} truncate`}>{value}</div>
+      <div className="text-xs text-indigo-200 font-medium truncate">{label}</div>
     </div>
   </div>
 );
@@ -55,16 +50,16 @@ const ProgressIndicator: React.FC<{
   const strikesPercentage = (strikes / 3) * 100;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* Main Progress */}
       <div className="space-y-2">
         <div className="flex justify-between items-center text-sm">
           <span className="text-indigo-200 font-medium">Quiz Progress</span>
           <span className="text-indigo-100 font-bold">{Math.min(current, total)}/{total}</span>
         </div>
-        <div className="w-full bg-gray-700/50 rounded-full h-3 overflow-hidden">
+        <div className="w-full bg-gray-700/50 rounded-full h-2 sm:h-3 overflow-hidden">
           <div
-            className="progress-bar h-3 rounded-full transition-all duration-500 ease-out"
+            className="progress-bar h-2 sm:h-3 rounded-full transition-all duration-500 ease-out"
             style={{ width: `${progressPercentage}%` }}
           />
         </div>
@@ -108,44 +103,56 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
   const [isShaking, setIsShaking] = useState<boolean>(false);
   const [isCelebrating, setIsCelebrating] = useState<boolean>(false);
   const [lastScore, setLastScore] = useState<number>(score);
-  const [isMobileKeyboardOpen, setIsMobileKeyboardOpen] = useState<boolean>(false);
+  const [keyboardVisible, setKeyboardVisible] = useState<boolean>(false);
 
-  // Mobile keyboard detection
+  // Mobile keyboard detection and handling
   useEffect(() => {
-    const detectKeyboard = () => {
-      const initialViewportHeight = window.visualViewport?.height || window.innerHeight;
-      
-      const handleViewportChange = () => {
-        const currentHeight = window.visualViewport?.height || window.innerHeight;
-        const heightDifference = initialViewportHeight - currentHeight;
-        
-        // If viewport height decreased by more than 150px, keyboard is likely open
-        setIsMobileKeyboardOpen(heightDifference > 150);
-      };
-
+    const handleViewportChange = () => {
       if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', handleViewportChange);
-        return () => window.visualViewport?.removeEventListener('resize', handleViewportChange);
-      } else {
-        window.addEventListener('resize', handleViewportChange);
-        return () => window.removeEventListener('resize', handleViewportChange);
+        const isKeyboardOpen = window.visualViewport.height < window.innerHeight * 0.8;
+        setKeyboardVisible(isKeyboardOpen);
+        
+        // Scroll to input when keyboard opens
+        if (isKeyboardOpen && !isAnswerSubmitted) {
+          setTimeout(() => {
+            const inputElement = document.getElementById('answer-input');
+            if (inputElement) {
+              inputElement.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center',
+                inline: 'nearest' 
+              });
+            }
+          }, 150);
+        }
       }
     };
 
-    return detectKeyboard();
-  }, []);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleViewportChange);
+      return () => {
+        if (window.visualViewport) {
+          window.visualViewport.removeEventListener('resize', handleViewportChange);
+        }
+      };
+    }
+  }, [isAnswerSubmitted]);
 
   useEffect(() => {
     setUserAnswer(''); 
     if (problem && !isAnswerSubmitted && !isLoadingProblem && problem.problemType !== ProblemType.ERROR_GENERATING) {
         const inputElement = document.getElementById('answer-input') as HTMLInputElement;
         if (inputElement) {
-            // Delay focus slightly on mobile to prevent layout issues
-            const isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-              setTimeout(() => inputElement.focus(), 100);
-            } else {
+            // Delay focus on mobile to prevent immediate keyboard popup
+            if (window.innerWidth > 640) {
               inputElement.focus();
+            } else {
+              // On mobile, only focus if user is actively interacting
+              setTimeout(() => {
+                if (document.hasFocus()) {
+                  inputElement.focus();
+                }
+              }, 100);
             }
         }
     }
@@ -236,37 +243,21 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
     }
   }, [isAnswerSubmitted, isLoadingProblem, problem, userAnswer, onAnswerSubmit]);
 
-  const handleAnswerChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserAnswer(e.target.value);
-  }, []);
+  const handleAnswerChange = useCallback((e: React.ChangeEvent<HTMLInputElement>): void => {
+    if (!isAnswerSubmitted) {
+      setUserAnswer(e.target.value);
+    }
+  }, [isAnswerSubmitted]);
 
-  const toggleDrawingCanvas = useCallback(() => {
+  const toggleDrawingCanvas = useCallback((): void => {
     setShowDrawingCanvas(prev => !prev);
   }, []);
 
-  const isFeedbackPositive = 
-    // Standard correct messages from constants.ts
+  const isFeedbackPositive = feedbackMessage && (
     feedbackMessage.includes('Awesome') || 
     feedbackMessage.includes('Great') || 
     feedbackMessage.includes('Fantastic') || 
-    feedbackMessage.includes('Super') || 
-    // Level up messages
     feedbackMessage.includes('LEVEL UP') ||
-    feedbackMessage.includes('Woohoo') ||
-    feedbackMessage.includes('Amazing') ||
-    feedbackMessage.includes('Incredible') ||
-    // Additional variations that might appear
-    feedbackMessage.includes('math whiz') ||
-    feedbackMessage.includes('Math Genius') ||
-    feedbackMessage.includes('nailed it') ||
-    feedbackMessage.includes('Keep shining') ||
-    feedbackMessage.includes('way!') ||
-    feedbackMessage.includes('on a roll') ||
-    feedbackMessage.includes('unstoppable') ||
-    feedbackMessage.includes('unlocked') ||
-    feedbackMessage.includes('smarter') ||
-    feedbackMessage.includes('tougher questions') ||
-    // Check for positive emojis/symbols
     feedbackMessage.includes('✨') ||
     feedbackMessage.includes('🧠💡') ||
     feedbackMessage.includes('⭐') ||
@@ -276,8 +267,9 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
     feedbackMessage.includes('🔓') ||
     feedbackMessage.includes('🌟') ||
     feedbackMessage.includes('🔥') ||
-    feedbackMessage.includes('🌠');
-  
+    feedbackMessage.includes('🌠')
+  );
+
   const getTimerClass = () => {
     if (problem?.problemType === ProblemType.ERROR_GENERATING) return 'text-gray-500';
     if (timeLeft <= 3) return 'timer-critical';
@@ -287,7 +279,7 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
 
   if (isLoadingProblem && !problem) {
     return (
-      <div className="w-full max-w-3xl mx-auto glass-card-strong rounded-2xl compact-spacing-lg flex flex-col items-center justify-center space-y-4 min-h-[300px]">
+      <div className="w-full max-w-3xl mx-auto glass-card-strong rounded-2xl compact-spacing-lg flex flex-col items-center justify-center space-y-4 min-h-[250px] sm:min-h-[300px]">
         <LoadingSpinner message="Generating your next challenge..." size="large" />
         <div className="text-center space-y-2">
           <div className="text-lg font-semibold text-indigo-100">🤖 AI is thinking...</div>
@@ -299,21 +291,21 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
 
   return (
     <>
-      <div className={`w-full max-w-3xl mx-auto space-y-4 ${isMobileKeyboardOpen ? 'mobile-keyboard-adjust' : ''}`}>
+      <div className={`w-full max-w-3xl mx-auto space-y-3 sm:space-y-4 mobile-container ${keyboardVisible ? 'keyboard-safe' : ''}`}>
         {/* Header with Stats */}
         <div className="glass-card-strong rounded-xl compact-spacing animate-slide-up">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center space-x-3">
-              <div className="text-2xl">🧠</div>
-              <div>
-                <h1 className="text-lg md:text-xl font-bold gradient-text-static">Math Genius Challenge</h1>
-                <div className="text-sm text-indigo-200">{DIFFICULTY_NAMES[level]} Level</div>
+          <div className="flex justify-between items-center mb-3 sm:mb-4">
+            <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+              <div className="text-xl sm:text-2xl">🧠</div>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-lg sm:text-xl font-bold gradient-text-static truncate">Math Genius Challenge</h1>
+                <div className="text-xs sm:text-sm text-indigo-200 truncate">{DIFFICULTY_NAMES[level]} Level</div>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
               <button
                 onClick={toggleDrawingCanvas}
-                className="btn-secondary text-white px-2 py-2 md:px-3 md:py-2 rounded-lg text-sm font-medium transition-all hover:scale-105 flex items-center space-x-1 md:space-x-2 min-h-[44px] min-w-[44px]"
+                className="btn-secondary text-white px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all hover:scale-105 flex items-center space-x-1 sm:space-x-2 touch-target"
                 title="Open drawing pad for calculations"
               >
                 <span>📝</span>
@@ -323,86 +315,84 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
             </div>
           </div>
 
-          {/* Mobile-optimized Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-3">
+          {/* Stats Grid - Responsive */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
             <StatCard
-              icon={<TrendingUpIcon className="w-4 h-4 md:w-5 md:h-5" />}
+              icon={<TrendingUpIcon className="w-4 h-4 sm:w-5 sm:h-5" />}
               label="Level"
               value={level}
               color="text-yellow-300"
             />
             <StatCard
-              icon={<StarIcon className="w-4 h-4 md:w-5 md:h-5" />}
+              icon={<StarIcon className="w-4 h-4 sm:w-5 sm:h-5" />}
               label="Score"
               value={score}
               color="text-green-300"
               animate={score > lastScore}
             />
             <StatCard
-              icon={<SparklesIcon className="w-4 h-4 md:w-5 md:h-5" />}
+              icon={<SparklesIcon className="w-4 h-4 sm:w-5 sm:h-5" />}
               label="Streak"
               value={strikes}
               color="text-orange-300"
             />
           </div>
 
-          {/* Progress Indicators - Compact on mobile keyboard */}
-          {!isMobileKeyboardOpen && (
-            <div className="mt-4">
-              <ProgressIndicator
-                current={questionsAttempted}
-                total={totalQuestions}
-                strikes={strikes}
-                level={level}
-              />
-            </div>
-          )}
+          {/* Progress Indicators */}
+          <div className="mt-3 sm:mt-4">
+            <ProgressIndicator
+              current={questionsAttempted}
+              total={totalQuestions}
+              strikes={strikes}
+              level={level}
+            />
+          </div>
         </div>
 
-        {/* Main Game Area - Adaptive height */}
+        {/* Main Game Area */}
         <div className={`glass-card-strong rounded-2xl compact-spacing-lg animate-scale-in ${
           isShaking ? 'animate-shake' : isCelebrating ? 'animate-celebrate' : ''
-        } ${isMobileKeyboardOpen ? 'min-h-0' : ''}`}>
-          {/* Timer - Compact on mobile keyboard */}
-          <div className={`flex items-center justify-center space-x-2 text-xl md:text-2xl font-bold glass-card p-2 md:p-3 rounded-xl ${isMobileKeyboardOpen ? 'mb-3' : 'mb-6'} ${problem?.problemType === ProblemType.ERROR_GENERATING ? 'opacity-50' : ''}`}>
-            <TimerIcon className={`w-6 h-6 md:w-8 md:h-8 ${problem?.problemType === ProblemType.ERROR_GENERATING ? 'text-gray-500' : 'text-red-400'} ${timeLeft <= 5 && timeLeft > 0 ? 'animate-pulse' : ''}`} />
+        } ${keyboardVisible ? 'compact-landscape' : ''}`}>
+          {/* Timer */}
+          <div className={`flex items-center justify-center space-x-2 text-xl sm:text-2xl font-bold glass-card p-2 sm:p-3 rounded-xl mb-4 sm:mb-6 ${problem?.problemType === ProblemType.ERROR_GENERATING ? 'opacity-50' : ''}`}>
+            <TimerIcon className={`w-6 h-6 sm:w-8 sm:h-8 ${problem?.problemType === ProblemType.ERROR_GENERATING ? 'text-gray-500' : 'text-red-400'} ${timeLeft <= 5 && timeLeft > 0 ? 'animate-pulse' : ''}`} />
             <span className={getTimerClass()}>{timeLeft}s</span>
             {timeLeft <= 5 && timeLeft > 0 && problem?.problemType !== ProblemType.ERROR_GENERATING && (
-              <div className="text-sm text-red-400 font-medium animate-bounce">HURRY!</div>
+              <div className="text-xs sm:text-sm text-red-400 font-medium animate-bounce">HURRY!</div>
             )}
           </div>
 
-          {/* Question - Adaptive sizing */}
-          <div className={`glass-card p-3 md:p-6 rounded-xl text-center ${isMobileKeyboardOpen ? 'min-h-[80px] mb-3' : 'min-h-[100px] mb-6'} flex items-center justify-center`}>
+          {/* Question */}
+          <div className="glass-card p-3 sm:p-6 rounded-xl text-center min-h-[80px] sm:min-h-[100px] flex items-center justify-center mb-4 sm:mb-6">
             {isLoadingProblem && problem === null ? (
                  <div className="space-y-3">
-                   <div className="loading-shimmer h-6 rounded-lg"></div>
-                   <div className="text-sm md:text-lg font-semibold text-gray-300">Loading question...</div>
+                   <div className="loading-shimmer h-4 sm:h-6 rounded-lg"></div>
+                   <div className="text-base sm:text-lg font-semibold text-gray-300">Loading question...</div>
                  </div>
             ) : problem?.problemType === ProblemType.ERROR_GENERATING ? (
                 <div className="text-red-300 flex flex-col items-center gap-3 animate-bounce-in">
-                    <AlertTriangleIcon className="w-8 h-8 md:w-10 md:h-10" />
-                    <p className="text-base md:text-lg font-semibold">{problem.questionText}</p>
-                    <p className="text-sm opacity-80">Click "Next Question" to try again.</p>
+                    <AlertTriangleIcon className="w-8 h-8 sm:w-10 sm:h-10" />
+                    <p className="text-base sm:text-lg font-semibold px-2">{problem.questionText}</p>
+                    <p className="text-xs sm:text-sm opacity-80">Click "Next Question" to try again.</p>
                 </div>
             ) : problem ? (
-              <div key={problem.id} id="question-text" className="animate-bounce-in" role="heading" aria-level={2}>
+              <div key={problem.id} id="question-text" className="animate-bounce-in w-full" role="heading" aria-level={2}>
                 {problem.hasLatex ? (
-                  <MathRenderer className="text-center text-lg md:text-xl lg:text-3xl font-bold text-white">{problem.questionText}</MathRenderer>
+                  <MathRenderer className="text-center text-lg sm:text-xl md:text-3xl font-bold text-white">{problem.questionText}</MathRenderer>
                 ) : (
-                  <div className="text-lg md:text-xl lg:text-3xl font-bold text-white break-words">{problem.questionText}</div>
+                  <div className="text-lg sm:text-xl md:text-3xl font-bold text-white break-words px-2">{problem.questionText}</div>
                 )}
               </div>
             ) : (
                <div className="space-y-3">
-                 <div className="loading-shimmer h-6 rounded-lg"></div>
-                 <div className="text-sm md:text-lg font-semibold text-gray-400">Waiting for problem...</div>
+                 <div className="loading-shimmer h-4 sm:h-6 rounded-lg"></div>
+                 <div className="text-base sm:text-lg font-semibold text-gray-400">Waiting for problem...</div>
                </div>
             )}
           </div>
 
-          {/* Answer Form - Mobile optimized */}
-          <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
+          {/* Answer Form */}
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             <div className="relative">
               <input
                 id="answer-input"
@@ -412,15 +402,15 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
                 onChange={handleAnswerChange}
                 placeholder="Enter your answer..."
                 disabled={isAnswerSubmitted || isLoadingProblem || !problem || problem.problemType === ProblemType.ERROR_GENERATING}
-                className="w-full p-3 md:p-4 text-lg md:text-xl text-center rounded-xl border-2 border-transparent focus:border-sky-400 focus:ring-2 focus:ring-sky-300/50 outline-none transition-all input-enhanced focus-ring focus-enhanced"
-                autoFocus={!isLoadingProblem && problem?.problemType !== ProblemType.ERROR_GENERATING}
+                className="w-full p-3 sm:p-4 text-lg sm:text-xl text-center rounded-xl border-2 border-transparent focus:border-sky-400 focus:ring-2 focus:ring-sky-300/50 outline-none transition-all input-enhanced input-mobile-optimized focus-ring"
+                autoFocus={false}
                 aria-label="Enter your answer to the math problem"
                 aria-describedby="question-text"
                 inputMode="decimal"
               />
               {userAnswer && !isAnswerSubmitted && (
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 sm:w-3 sm:h-3 bg-green-400 rounded-full animate-pulse"></div>
                 </div>
               )}
             </div>
@@ -428,17 +418,17 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
             <button
               type="submit"
               disabled={isAnswerSubmitted || userAnswer.trim() === '' || isLoadingProblem || !problem || problem.problemType === ProblemType.ERROR_GENERATING}
-              className="w-full btn-primary text-white font-bold py-3 md:py-4 px-6 rounded-xl text-lg md:text-xl shadow-xl transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center space-x-3 min-h-[48px]"
+              className="w-full btn-primary text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl text-lg sm:text-xl shadow-xl transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center space-x-2 sm:space-x-3 touch-target-comfortable"
               aria-label="Submit your answer"
             >
               {isAnswerSubmitted ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   <span>Processing...</span>
                 </>
               ) : (
                 <>
-                  <CheckCircleIcon className="w-5 h-5" />
+                  <CheckCircleIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span>Submit Answer</span>
                 </>
               )}
@@ -448,25 +438,25 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
 
         {/* Feedback Section */}
         {(feedbackMessage || showCorrectAnswer || canProceedToNext) && (
-          <div className="space-y-4 animate-slide-up">
+          <div className="space-y-3 sm:space-y-4 animate-slide-up">
             {/* Feedback Message */}
             {isAnswerSubmitted && feedbackMessage && (
-              <div className={`glass-card p-6 rounded-2xl text-center text-lg font-semibold flex items-center justify-center space-x-3 ${isFeedbackPositive ? 'bg-green-500/20 border-green-500/30' : 'bg-red-500/20 border-red-500/30'} animate-bounce-in`}>
+              <div className={`glass-card p-4 sm:p-6 rounded-2xl text-center text-base sm:text-lg font-semibold flex items-center justify-center space-x-2 sm:space-x-3 ${isFeedbackPositive ? 'bg-green-500/20 border-green-500/30' : 'bg-red-500/20 border-red-500/30'} animate-bounce-in`}>
                 {isFeedbackPositive ? (
-                  <CheckCircleIcon className="w-8 h-8 text-green-400" />
+                  <CheckCircleIcon className="w-6 h-6 sm:w-8 sm:h-8 text-green-400 flex-shrink-0" />
                 ) : (
-                  <XCircleIcon className="w-8 h-8 text-red-400" />
+                  <XCircleIcon className="w-6 h-6 sm:w-8 sm:h-8 text-red-400 flex-shrink-0" />
                 )}
-                <span className={isFeedbackPositive ? 'text-green-100' : 'text-red-100'}>{feedbackMessage}</span>
-                {isFeedbackPositive && <SparklesIcon className="w-6 h-6 text-yellow-400 animate-spin" />}
+                <span className={`${isFeedbackPositive ? 'text-green-100' : 'text-red-100'} break-words`}>{feedbackMessage}</span>
+                {isFeedbackPositive && <SparklesIcon className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400 animate-spin flex-shrink-0" />}
               </div>
             )}
 
             {/* Correct Answer Display */}
             {showCorrectAnswer && problem && problem.problemType !== ProblemType.ERROR_GENERATING && (
-              <div className="glass-card p-6 rounded-2xl text-center bg-blue-500/20 border-blue-500/30 animate-scale-in">
-                <p className="text-lg font-semibold text-blue-100">
-                  The correct answer was: <span className="text-yellow-300 text-2xl font-bold animate-number-pop">{problem.answer}</span>
+              <div className="glass-card p-4 sm:p-6 rounded-2xl text-center bg-blue-500/20 border-blue-500/30 animate-scale-in">
+                <p className="text-base sm:text-lg font-semibold text-blue-100 break-words">
+                  The correct answer was: <span className="text-yellow-300 text-xl sm:text-2xl font-bold animate-number-pop">{problem.answer}</span>
                 </p>
               </div>
             )}
@@ -475,43 +465,38 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
             {canProceedToNext && (
               <button
                 onClick={onProceedToNext}
-                className="w-full btn-secondary text-white font-bold py-6 px-8 rounded-2xl text-xl shadow-2xl transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-pink-300 animate-bounce-in flex items-center justify-center space-x-3"
+                className="w-full btn-secondary text-white font-bold py-4 sm:py-6 px-6 sm:px-8 rounded-2xl text-lg sm:text-xl shadow-2xl transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-pink-300 animate-bounce-in flex items-center justify-center space-x-2 sm:space-x-3 touch-target-comfortable"
                 aria-label="Proceed to next question"
               >
                 <span>Next Challenge</span>
-                <div className="text-2xl">🚀</div>
+                <div className="text-xl sm:text-2xl">🚀</div>
               </button>
             )}
-          </div>
-        )}
-
-        {/* Question Source Status */}
-        {problem && (
-          <div className="flex justify-center animate-scale-in">
-            <div className={`px-4 py-2 rounded-full text-sm font-medium glass-card ${
-              problem.problemType === ProblemType.AI_GENERATED 
-                ? 'bg-green-500/20 text-green-300 border-green-500/30' 
-                : problem.problemType === ProblemType.ERROR_GENERATING
-                ? 'bg-red-500/20 text-red-300 border-red-500/30'
-                : 'bg-blue-500/20 text-blue-300 border-blue-500/30'
-            }`}>
-              {problem.problemType === ProblemType.AI_GENERATED 
-                ? '🤖 AI Generated Challenge' 
-                : problem.problemType === ProblemType.ERROR_GENERATING
-                ? '❌ Error Loading Question'
-                : '📚 Curated Challenge'}
-            </div>
           </div>
         )}
       </div>
 
       {/* Drawing Canvas Modal */}
-      <DrawingCanvas 
-        isVisible={showDrawingCanvas}
-        onToggle={toggleDrawingCanvas}
-      />
+      {showDrawingCanvas && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 focus-trap">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-800">Drawing Pad</h3>
+              <button
+                onClick={toggleDrawingCanvas}
+                className="text-gray-500 hover:text-gray-700 text-2xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors touch-target"
+                aria-label="Close drawing pad"
+              >
+                ×
+              </button>
+            </div>
+            <DrawingCanvas />
+          </div>
+        </div>
+      )}
     </>
   );
 });
 
+GameScreen.displayName = 'GameScreen';
 export default GameScreen;

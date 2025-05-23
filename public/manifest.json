@@ -4,11 +4,9 @@
   "description": "Challenge yourself with AI-generated math problems. Progressive difficulty levels from basic arithmetic to advanced algebra.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#667eea",
-  "theme_color": "#667eea",
-  "orientation": "any",
-  "display_override": ["standalone", "minimal-ui"],
-  "prefer_related_applications": false,
+  "background_color": "#3b82f6",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "/favicon.ico",
@@ -18,22 +16,5 @@
   ],
   "categories": ["education", "games", "utilities"],
   "lang": "en",
-  "scope": "/",
-  "edge_side_panel": {
-    "preferred_width": 400
-  },
-  "shortcuts": [
-    {
-      "name": "Quick Game",
-      "short_name": "Play",
-      "description": "Start a quick math challenge",
-      "url": "/",
-      "icons": [
-        {
-          "src": "/favicon.ico",
-          "sizes": "32x32"
-        }
-      ]
-    }
-  ]
+  "scope": "/"
 } 
