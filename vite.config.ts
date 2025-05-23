@@ -30,9 +30,6 @@ export default defineConfig(({ mode }) => {
           '@': path.resolve(__dirname, '.'),
         }
       },
-      css: {
-        postcss: './postcss.config.js'
-      },
       build: {
         outDir: 'dist',
         sourcemap: false,
