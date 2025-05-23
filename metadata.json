@@ -1,5 +1,8 @@
 {
   "name": "Math Genius Challenge",
   "description": "A fun and encouraging math quiz app for Year 9 students with a level-up system to tackle progressively harder problems against the clock. Sharpen your math skills and become a Genius!",
-  "requestFramePermissions": []
+  "requestFramePermissions": [],
+  "version": "2.1.0",
+  "buildTime": "2025-01-23T03:30:00Z",
+  "cacheVersion": "v3"
 }
