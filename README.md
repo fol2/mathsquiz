@@ -143,6 +143,8 @@ Game constants can be modified in `src/constants.ts`:
 - Points per correct answer
 - Number of strikes needed to level up
 - Total questions per game
+- See **API_CALL_REDUCTION_PLAN.md** for advice on tuning these values to minimize
+  Gemini API usage.
 
 ## 🚢 Deployment
 
