@@ -112,8 +112,10 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
               <select
                 id="start-level"
                 value={startLevel}
-                onChange={(e) => setStartLevel(Number(e.target.value) as DifficultyLevel)}
-                className="w-full p-2 rounded-lg text-black"
+                onChange={(e) =>
+                  setStartLevel(Number(e.target.value) as DifficultyLevel)
+                }
+                className="w-full p-3 sm:p-4 rounded-xl input-mobile-optimized input-enhanced"
               >
                 {Array.from({ length: MAX_LEVEL }, (_, i) => i + 1).map(level => (
                   <option key={level} value={level}>

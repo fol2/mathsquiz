@@ -15,7 +15,7 @@ const MathRenderer: React.FC<MathRendererProps> = ({
 }) => {
   // Convert various LaTeX formats to markdown math syntax
   const normalizeLatexForMarkdown = (latex: string): string => {
-    let normalized = latex.trim();
+    const normalized = latex.trim();
     
     // If it already has proper markdown math delimiters, return as is
     if (normalized.includes('$')) {

@@ -348,7 +348,9 @@ const prefetchBatch = async (level: DifficultyLevel): Promise<void> => {
     const batch = await generateQuestionBatch(level);
     questionBatches.set(level, batch);
     saveQuestionBatchesToStorage();
-    console.log(`Prefetched batch of ${batch.questions.length} questions for level ${level}`);
+    console.warn(
+      `Prefetched batch of ${batch.questions.length} questions for level ${level}`
+    );
   } catch (error) {
     console.error(`Failed to prefetch batch for level ${level}:`, error);
   }

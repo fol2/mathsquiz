@@ -629,6 +629,12 @@ body {
   transform: none;
 }
 
+/* Ensure dropdown options are readable */
+.input-enhanced option {
+  color: white;
+  background-color: #1f2937;
+}
+
 /* Optimized spacing utilities */
 .compact-spacing {
   padding: 1rem;

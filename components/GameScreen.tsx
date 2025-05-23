@@ -171,7 +171,9 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
     if (isAnswerSubmitted && feedbackMessage) {
       const isCorrectAnswer = isPositiveFeedback(feedbackMessage);
       
-      console.log(`Feedback: "${feedbackMessage}" | Detected as: ${isCorrectAnswer ? 'CORRECT' : 'INCORRECT'}`);
+      console.warn(
+        `Feedback: "${feedbackMessage}" | Detected as: ${isCorrectAnswer ? 'CORRECT' : 'INCORRECT'}`
+      );
       
       if (isCorrectAnswer) {
         setIsCelebrating(true);
