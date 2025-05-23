@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,36 +7,11 @@
     <meta name="description" content="Challenge yourself with AI-generated math problems. Progressive difficulty levels from basic arithmetic to advanced algebra.">
     <meta name="theme-color" content="#3b82f6">
     <link rel="manifest" href="/manifest.json">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      /* Custom font for a more playful/educational feel */
-      @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap');
-      body {
-        font-family: 'Nunito', sans-serif;
-        overscroll-behavior: none; /* Prevents pull-to-refresh on mobile */
-      }
-      .gradient-text {
-        background-clip: text;
-        -webkit-background-clip: text;
-        color: transparent;
-      }
-       /* Custom scrollbar for webkit browsers */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 10px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-      }
-    </style>
-  <script type="importmap">
+    
+    <!-- KaTeX CSS for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    
+    <script type="importmap">
 {
   "imports": {
     "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
@@ -47,13 +22,13 @@
 }
 </script>
 </head>
-  <body class="bg-gradient-to-br from-sky-400 to-indigo-600">
+  <body class="dark:bg-gradient-to-br dark:from-sky-900 dark:to-indigo-900 light:bg-gradient-to-br light:from-sky-200 light:to-indigo-300 transition-all duration-300">
     <div id="root"></div>
 
     <!-- Sound Effects -->
     <audio id="correctSoundAwesome" src="/sounds/awesome.mp3" preload="auto"></audio>
     <audio id="correctSoundAmazing" src="/sounds/amazing.mp3" preload="auto"></audio>
-    <audio id="correctSoundAstonishing" src="/sounds/astonishing.mp3" preload="auto"></audio> <!-- Added placeholder for astonishing -->
+    <audio id="correctSoundAstonishing" src="/sounds/astonishing.mp3" preload="auto"></audio>
     <audio id="levelUpSound" src="/sounds/level_up.mp3" preload="auto"></audio>
 
     <script type="module" src="/index.tsx"></script>

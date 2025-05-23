@@ -2,6 +2,7 @@ export enum GameState {
   NOT_STARTED = 'NOT_STARTED',
   PLAYING = 'PLAYING',
   GAME_OVER = 'GAME_OVER',
+  API_KEY_SETUP = 'API_KEY_SETUP',
 }
 
 export enum DifficultyLevel {
@@ -19,6 +20,7 @@ export interface MathProblem {
   difficulty: DifficultyLevel;
   problemType: ProblemType;
   explanation?: string; // For future use
+  hasLatex?: boolean; // Indicates if question contains LaTeX
 }
 
 export enum ProblemType {
@@ -40,4 +42,15 @@ export enum ProblemType {
   WORD_PROBLEM_MULTI_STEP_ARITHMETIC = 'WORD_PROBLEM_MULTI_STEP_ARITHMETIC',
   AI_GENERATED = 'AI_GENERATED', // New type for AI-generated questions
   ERROR_GENERATING = 'ERROR_GENERATING', // Type for when AI fails
+}
+
+export interface APIKeyConfig {
+  apiKey: string;
+  isValid: boolean;
+}
+
+export interface QuestionBatch {
+  questions: MathProblem[];
+  level: DifficultyLevel;
+  timestamp: number;
 }

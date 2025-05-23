@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface IconProps {
@@ -49,7 +48,7 @@ export const ArrowUpIcon: React.FC<IconProps> = ({ className }) => (
 
 export const TrophyIcon: React.FC<IconProps> = ({ className }) => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-4.5A3.375 3.375 0 0 0 12.75 9H11.25A3.375 3.375 0 0 0 7.5 12.375V18.75m conectadosM16.5 18.75H21M7.5 18.75H3M12 14.25V21m0-13.5V4.5A2.25 2.25 0 0 1 14.25 2.25h1.5A2.25 2.25 0 0 1 18 4.5v3.75m-12 0V4.5A2.25 2.25 0 0 0 8.25 2.25H9.75A2.25 2.25 0 0 0 12 4.5v3.75" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-4.5A3.375 3.375 0 0 0 12.75 9H11.25A3.375 3.375 0 0 0 7.5 12.375V18.75m9 0H21M7.5 18.75H3M12 14.25V21m0-13.5V4.5A2.25 2.25 0 0 1 14.25 2.25h1.5A2.25 2.25 0 0 1 18 4.5v3.75m-12 0V4.5A2.25 2.25 0 0 0 8.25 2.25H9.75A2.25 2.25 0 0 0 12 4.5v3.75" />
   </svg>
 );
 
