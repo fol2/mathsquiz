@@ -56,17 +56,18 @@ const App = (): React.JSX.Element => {
     playSound("levelUpSound");
   }, []);
 
-  const getTimerDuration = useCallback((): number => {
-    return INITIAL_TIME_PER_QUESTION + (currentLevel - 1) * TIME_INCREMENT_PER_LEVEL;
-  }, [currentLevel]);
+  const computeTimerDuration = (level: DifficultyLevel): number => {
+    return INITIAL_TIME_PER_QUESTION + (level - 1) * TIME_INCREMENT_PER_LEVEL;
+  };
 
-  const prefetchProblem = useCallback(async () => {
+
+  const prefetchProblem = useCallback(async (level: DifficultyLevel) => {
     if (isPrefetching || nextProblemBuffer || !hasValidApiKey()) {
       return;
     }
     setIsPrefetching(true);
     try {
-      const problem = await generateProblem(currentLevel);
+      const problem = await generateProblem(level);
       if (problem.problemType !== ProblemType.ERROR_GENERATING) {
         setNextProblemBuffer(problem);
       }
@@ -75,37 +76,39 @@ const App = (): React.JSX.Element => {
     } finally {
       setIsPrefetching(false);
     }
-  }, [currentLevel, isPrefetching, nextProblemBuffer]);
+  }, [isPrefetching, nextProblemBuffer]);
 
-  const loadNextProblem = useCallback(async (): Promise<void> => {
+  const loadNextProblem = useCallback(async (levelOverride?: DifficultyLevel): Promise<void> => {
     setIsAnswerSubmitted(false);
     setFeedbackMessage('');
     setShowCorrectAnswer(false);
     setCanProceedToNext(false);
-    
+
+    const level = levelOverride ?? currentLevel;
+
     if (questionsAttempted >= TOTAL_QUESTIONS) {
       const gameEndTime = Date.now();
       const totalGameTime = gameEndTime - gameStartTime;
       const averageTimePerQuestion = totalGameTime / TOTAL_QUESTIONS / 1000;
-      
-      updateGameEnd(score, currentLevel, correctAnswersCount, averageTimePerQuestion);
+
+      updateGameEnd(score, level, correctAnswersCount, averageTimePerQuestion);
       setGameState(GameState.GAME_OVER);
       return;
     }
-    
+
     setIsLoadingProblem(true);
     setCurrentProblem(null);
 
     try {
       let problemToSet: MathProblem | null = null;
-      if (nextProblemBuffer && nextProblemBuffer.difficulty === currentLevel) {
+      if (nextProblemBuffer && nextProblemBuffer.difficulty === level) {
         problemToSet = nextProblemBuffer;
         setNextProblemBuffer(null);
         if (process.env.NODE_ENV === 'development') {
           console.warn("Loaded problem from PREFETCH BUFFER.", problemToSet);
         }
       } else {
-        if (nextProblemBuffer && nextProblemBuffer.difficulty !== currentLevel) {
+        if (nextProblemBuffer && nextProblemBuffer.difficulty !== level) {
             if (process.env.NODE_ENV === 'development') {
               console.warn(
                 "Prefetch buffer had problem for different level, fetching new."
@@ -113,7 +116,7 @@ const App = (): React.JSX.Element => {
             }
             setNextProblemBuffer(null);
         }
-        problemToSet = await generateProblem(currentLevel);
+        problemToSet = await generateProblem(level);
         if (process.env.NODE_ENV === 'development') {
           console.warn(
             problemToSet.problemType === ProblemType.AI_GENERATED
@@ -125,13 +128,13 @@ const App = (): React.JSX.Element => {
           );
         }
       }
-      
+
       setCurrentProblem(problemToSet);
-      setTimeLeft(getTimerDuration());
+      setTimeLeft(computeTimerDuration(level));
       setQuestionsAttempted(prev => prev + 1);
 
       if (questionsAttempted + 1 < TOTAL_QUESTIONS) {
-          prefetchProblem();
+          prefetchProblem(level);
       }
 
     } catch (error) {
@@ -140,13 +143,13 @@ const App = (): React.JSX.Element => {
             id: 'error-load-critical',
             questionText: "Oops! Critical error loading question. Please refresh.",
             answer: 0,
-            difficulty: currentLevel,
+            difficulty: level,
             problemType: ProblemType.ERROR_GENERATING
         });
     } finally {
         setIsLoadingProblem(false);
     }
-  }, [currentLevel, questionsAttempted, getTimerDuration, nextProblemBuffer, prefetchProblem, score, gameStartTime, correctAnswersCount, updateGameEnd]);
+  }, [currentLevel, questionsAttempted, nextProblemBuffer, prefetchProblem, score, gameStartTime, correctAnswersCount, updateGameEnd]);
 
   const handleAnswerSubmit = useCallback(async (answer: string): Promise<void> => {
     if (isAnswerSubmitted) return;
@@ -223,14 +226,14 @@ const App = (): React.JSX.Element => {
     setScore(0);
     setStrikes(0);
     setCurrentLevel(level);
-    setQuestionsAttempted(0); 
+    setQuestionsAttempted(0);
     setCorrectAnswersCount(0);
     setGameStartTime(Date.now());
     setGameState(GameState.PLAYING);
-    setCorrectSoundIndex(0); 
+    setCorrectSoundIndex(0);
     setNextProblemBuffer(null);
     setIsPrefetching(false);
-    await loadNextProblem(); 
+    await loadNextProblem(level);
   };
   
   const closeLevelUpModal = async (): Promise<void> => {
