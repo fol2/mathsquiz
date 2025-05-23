@@ -96,7 +96,7 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ level, onClose }) => {
       )}
 
       {/* Main Modal */}
-      <div className="glass-card-strong rounded-2xl compact-spacing-lg max-w-xl w-full mx-auto text-center animate-bounce-in">
+      <div className="glass-card-strong rounded-2xl compact-spacing-lg max-w-xl w-full mx-auto text-center animate-bounce-in max-h-[90vh] overflow-y-auto">
         {/* Header with Trophy */}
         <div className="mb-6">
           <div className="flex justify-center mb-4">
