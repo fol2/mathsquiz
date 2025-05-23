@@ -1,6 +1,6 @@
 import { GoogleGenAI, GenerateContentResponse } from '@google/genai';
-import { MathProblem, DifficultyLevel, ProblemType, QuestionBatch } from '../types';
-import { TOTAL_QUESTIONS } from '../constants';
+import { MathProblem, DifficultyLevel, ProblemType, QuestionBatch } from '../types.js';
+import { TOTAL_QUESTIONS } from '../constants.js';
 
 // Storage key for persisting the API key in the browser
 const API_KEY_STORAGE_KEY = 'mathGeniusApiKey';
