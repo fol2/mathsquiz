@@ -1,4 +1,4 @@
-import { DifficultyLevel } from './types';
+import { DifficultyLevel } from './types.js';
 
 export const STARTING_LEVEL: DifficultyLevel = DifficultyLevel.LEVEL_1;
 export const MAX_LEVEL: DifficultyLevel = DifficultyLevel.LEVEL_20;
