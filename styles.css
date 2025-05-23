@@ -471,4 +471,62 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Input field improvements for better contrast */
+.input-enhanced {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #1a202c !important;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+}
+
+.input-enhanced:focus {
+  background: rgba(255, 255, 255, 0.98) !important;
+  color: #1a202c !important;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.input-enhanced:disabled {
+  background: rgba(100, 116, 139, 0.7) !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(100, 116, 139, 0.5);
+}
+
+/* Compact sizing for better viewport fit */
+.compact-spacing {
+  padding: 1rem;
+}
+
+.compact-spacing-lg {
+  padding: 1.5rem;
+}
+
+/* Success celebration animation instead of shake */
+@keyframes celebrate {
+  0% { 
+    transform: scale(1) rotate(0deg);
+    filter: hue-rotate(0deg);
+  }
+  25% { 
+    transform: scale(1.02) rotate(1deg);
+    filter: hue-rotate(90deg);
+  }
+  50% { 
+    transform: scale(1.05) rotate(-1deg);
+    filter: hue-rotate(180deg);
+  }
+  75% { 
+    transform: scale(1.02) rotate(1deg);
+    filter: hue-rotate(270deg);
+  }
+  100% { 
+    transform: scale(1) rotate(0deg);
+    filter: hue-rotate(360deg);
+  }
+}
+
+.animate-celebrate {
+  animation: celebrate 0.6s ease-in-out;
 } 

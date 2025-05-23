@@ -31,10 +31,10 @@ const StatCard: React.FC<{
   color: string;
   animate?: boolean;
 }> = ({ icon, label, value, color, animate = false }) => (
-  <div className={`glass-card p-3 rounded-xl card-hover flex items-center space-x-3 ${animate ? 'animate-number-pop' : ''}`}>
-    <div className={`text-2xl ${color}`}>{icon}</div>
+  <div className={`glass-card p-2 rounded-lg card-hover flex items-center space-x-2 ${animate ? 'animate-number-pop' : ''}`}>
+    <div className={`text-lg ${color}`}>{icon}</div>
     <div>
-      <div className={`text-lg font-bold ${color}`}>{value}</div>
+      <div className={`text-sm font-bold ${color}`}>{value}</div>
       <div className="text-xs text-indigo-200 font-medium">{label}</div>
     </div>
   </div>
@@ -101,6 +101,7 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
   const [userAnswer, setUserAnswer] = useState<string>('');
   const [showDrawingCanvas, setShowDrawingCanvas] = useState<boolean>(false);
   const [isShaking, setIsShaking] = useState<boolean>(false);
+  const [isCelebrating, setIsCelebrating] = useState<boolean>(false);
   const [lastScore, setLastScore] = useState<number>(score);
 
   useEffect(() => {
@@ -120,12 +121,24 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
     }
   }, [score, lastScore]);
 
-  // Shake animation for wrong answers
+  // Animation effects for correct vs incorrect answers
   useEffect(() => {
-    if (isAnswerSubmitted && !feedbackMessage.includes('Awesome') && !feedbackMessage.includes('Great') && !feedbackMessage.includes('LEVEL UP')) {
-      setIsShaking(true);
-      const timer = setTimeout(() => setIsShaking(false), 600);
-      return () => clearTimeout(timer);
+    if (isAnswerSubmitted && feedbackMessage) {
+      const isCorrectAnswer = feedbackMessage.includes('Awesome') || 
+                             feedbackMessage.includes('Great') || 
+                             feedbackMessage.includes('Fantastic') || 
+                             feedbackMessage.includes('Super') || 
+                             feedbackMessage.includes('LEVEL UP');
+      
+      if (isCorrectAnswer) {
+        setIsCelebrating(true);
+        const timer = setTimeout(() => setIsCelebrating(false), 600);
+        return () => clearTimeout(timer);
+      } else {
+        setIsShaking(true);
+        const timer = setTimeout(() => setIsShaking(false), 600);
+        return () => clearTimeout(timer);
+      }
     }
   }, [isAnswerSubmitted, feedbackMessage]);
 
@@ -174,7 +187,7 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
 
   if (isLoadingProblem && !problem) {
     return (
-      <div className="w-full max-w-4xl mx-auto glass-card-strong rounded-3xl p-8 flex flex-col items-center justify-center space-y-6 min-h-[500px]">
+      <div className="w-full max-w-3xl mx-auto glass-card-strong rounded-2xl compact-spacing-lg flex flex-col items-center justify-center space-y-4 min-h-[300px]">
         <LoadingSpinner message="Generating your next challenge..." size="large" />
         <div className="text-center space-y-2">
           <div className="text-lg font-semibold text-indigo-100">🤖 AI is thinking...</div>
@@ -186,21 +199,21 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
 
   return (
     <>
-      <div className="w-full max-w-4xl mx-auto space-y-6">
+      <div className="w-full max-w-3xl mx-auto space-y-4">
         {/* Header with Stats */}
-        <div className="glass-card-strong rounded-2xl p-6 animate-slide-up">
-          <div className="flex justify-between items-center mb-6">
+        <div className="glass-card-strong rounded-xl compact-spacing animate-slide-up">
+          <div className="flex justify-between items-center mb-4">
             <div className="flex items-center space-x-3">
-              <div className="text-3xl">🧠</div>
+              <div className="text-2xl">🧠</div>
               <div>
-                <h1 className="text-2xl font-bold gradient-text-static">Math Genius Challenge</h1>
+                <h1 className="text-xl font-bold gradient-text-static">Math Genius Challenge</h1>
                 <div className="text-sm text-indigo-200">{DIFFICULTY_NAMES[level]} Level</div>
               </div>
             </div>
             <div className="flex items-center space-x-3">
               <button
                 onClick={toggleDrawingCanvas}
-                className="btn-secondary text-white px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105 flex items-center space-x-2"
+                className="btn-secondary text-white px-3 py-2 rounded-lg text-sm font-medium transition-all hover:scale-105 flex items-center space-x-2"
                 title="Open drawing pad for calculations"
               >
                 <span>📝</span>
@@ -211,22 +224,22 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-3">
             <StatCard
-              icon={<TrendingUpIcon className="w-6 h-6" />}
+              icon={<TrendingUpIcon className="w-5 h-5" />}
               label="Level"
               value={level}
               color="text-yellow-300"
             />
             <StatCard
-              icon={<StarIcon className="w-6 h-6" />}
+              icon={<StarIcon className="w-5 h-5" />}
               label="Score"
               value={score}
               color="text-green-300"
               animate={score > lastScore}
             />
             <StatCard
-              icon={<SparklesIcon className="w-6 h-6" />}
+              icon={<SparklesIcon className="w-5 h-5" />}
               label="Streak"
               value={strikes}
               color="text-orange-300"
@@ -234,7 +247,7 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
           </div>
 
           {/* Progress Indicators */}
-          <div className="mt-6">
+          <div className="mt-4">
             <ProgressIndicator
               current={questionsAttempted}
               total={totalQuestions}
@@ -245,10 +258,12 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
         </div>
 
         {/* Main Game Area */}
-        <div className={`glass-card-strong rounded-3xl p-8 animate-scale-in ${isShaking ? 'animate-shake' : ''}`}>
+        <div className={`glass-card-strong rounded-2xl compact-spacing-lg animate-scale-in ${
+          isShaking ? 'animate-shake' : isCelebrating ? 'animate-celebrate' : ''
+        }`}>
           {/* Timer */}
-          <div className={`flex items-center justify-center space-x-3 text-3xl font-bold glass-card p-4 rounded-2xl mb-8 ${problem?.problemType === ProblemType.ERROR_GENERATING ? 'opacity-50' : ''}`}>
-            <TimerIcon className={`w-10 h-10 ${problem?.problemType === ProblemType.ERROR_GENERATING ? 'text-gray-500' : 'text-red-400'} ${timeLeft <= 5 && timeLeft > 0 ? 'animate-pulse' : ''}`} />
+          <div className={`flex items-center justify-center space-x-2 text-2xl font-bold glass-card p-3 rounded-xl mb-6 ${problem?.problemType === ProblemType.ERROR_GENERATING ? 'opacity-50' : ''}`}>
+            <TimerIcon className={`w-8 h-8 ${problem?.problemType === ProblemType.ERROR_GENERATING ? 'text-gray-500' : 'text-red-400'} ${timeLeft <= 5 && timeLeft > 0 ? 'animate-pulse' : ''}`} />
             <span className={getTimerClass()}>{timeLeft}s</span>
             {timeLeft <= 5 && timeLeft > 0 && problem?.problemType !== ProblemType.ERROR_GENERATING && (
               <div className="text-sm text-red-400 font-medium animate-bounce">HURRY!</div>
@@ -256,36 +271,36 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
           </div>
 
           {/* Question */}
-          <div className="glass-card p-8 rounded-2xl text-center min-h-[150px] flex items-center justify-center mb-8">
+          <div className="glass-card p-6 rounded-xl text-center min-h-[100px] flex items-center justify-center mb-6">
             {isLoadingProblem && problem === null ? (
-                 <div className="space-y-4">
-                   <div className="loading-shimmer h-8 rounded-lg"></div>
+                 <div className="space-y-3">
+                   <div className="loading-shimmer h-6 rounded-lg"></div>
                    <div className="text-lg font-semibold text-gray-300">Loading question...</div>
                  </div>
             ) : problem?.problemType === ProblemType.ERROR_GENERATING ? (
-                <div className="text-red-300 flex flex-col items-center gap-4 animate-bounce-in">
-                    <AlertTriangleIcon className="w-12 h-12" />
-                    <p className="text-xl font-semibold">{problem.questionText}</p>
+                <div className="text-red-300 flex flex-col items-center gap-3 animate-bounce-in">
+                    <AlertTriangleIcon className="w-10 h-10" />
+                    <p className="text-lg font-semibold">{problem.questionText}</p>
                     <p className="text-sm opacity-80">Click "Next Question" to try again.</p>
                 </div>
             ) : problem ? (
               <div key={problem.id} id="question-text" className="animate-bounce-in" role="heading" aria-level={2}>
                 {problem.hasLatex ? (
-                  <MathRenderer className="text-center text-2xl md:text-4xl font-bold text-white">{problem.questionText}</MathRenderer>
+                  <MathRenderer className="text-center text-xl md:text-3xl font-bold text-white">{problem.questionText}</MathRenderer>
                 ) : (
-                  <div className="text-2xl md:text-4xl font-bold text-white break-words">{problem.questionText}</div>
+                  <div className="text-xl md:text-3xl font-bold text-white break-words">{problem.questionText}</div>
                 )}
               </div>
             ) : (
-               <div className="space-y-4">
-                 <div className="loading-shimmer h-8 rounded-lg"></div>
+               <div className="space-y-3">
+                 <div className="loading-shimmer h-6 rounded-lg"></div>
                  <div className="text-lg font-semibold text-gray-400">Waiting for problem...</div>
                </div>
             )}
           </div>
 
           {/* Answer Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="relative">
               <input
                 id="answer-input"
@@ -295,13 +310,13 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
                 onChange={handleAnswerChange}
                 placeholder="Enter your answer..."
                 disabled={isAnswerSubmitted || isLoadingProblem || !problem || problem.problemType === ProblemType.ERROR_GENERATING}
-                className="w-full p-6 text-2xl text-center text-gray-800 rounded-2xl border-3 border-transparent focus:border-sky-400 focus:ring-4 focus:ring-sky-300/50 outline-none transition-all disabled:bg-gray-700/50 disabled:text-gray-100 disabled:cursor-not-allowed glass-card focus-ring"
+                className="w-full p-4 text-xl text-center rounded-xl border-2 border-transparent focus:border-sky-400 focus:ring-2 focus:ring-sky-300/50 outline-none transition-all input-enhanced focus-ring"
                 autoFocus={!isLoadingProblem && problem?.problemType !== ProblemType.ERROR_GENERATING}
                 aria-label="Enter your answer to the math problem"
                 aria-describedby="question-text"
               />
               {userAnswer && !isAnswerSubmitted && (
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                   <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
                 </div>
               )}
@@ -310,17 +325,17 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
             <button
               type="submit"
               disabled={isAnswerSubmitted || userAnswer.trim() === '' || isLoadingProblem || !problem || problem.problemType === ProblemType.ERROR_GENERATING}
-              className="w-full btn-primary text-white font-bold py-6 px-8 rounded-2xl text-2xl shadow-2xl transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center space-x-3"
+              className="w-full btn-primary text-white font-bold py-4 px-6 rounded-xl text-xl shadow-xl transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center space-x-3"
               aria-label="Submit your answer"
             >
               {isAnswerSubmitted ? (
                 <>
-                  <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   <span>Processing...</span>
                 </>
               ) : (
                 <>
-                  <CheckCircleIcon className="w-6 h-6" />
+                  <CheckCircleIcon className="w-5 h-5" />
                   <span>Submit Answer</span>
                 </>
               )}

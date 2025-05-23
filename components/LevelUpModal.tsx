@@ -27,11 +27,11 @@ const AchievementBadge: React.FC<{
   delay: number;
 }> = ({ icon, title, description, delay }) => (
   <div
-    className="glass-card p-4 rounded-xl text-center card-hover animate-bounce-in"
+    className="glass-card p-3 rounded-lg text-center card-hover animate-bounce-in"
     style={{ animationDelay: `${delay}ms` }}
   >
-    <div className="text-4xl mb-2">{icon}</div>
-    <div className="text-lg font-bold text-yellow-300 mb-1">{title}</div>
+    <div className="text-2xl mb-2">{icon}</div>
+    <div className="text-sm font-bold text-yellow-300 mb-1">{title}</div>
     <div className="text-xs text-indigo-200">{description}</div>
   </div>
 );
@@ -78,7 +78,7 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ level, onClose }) => {
       {/* Confetti Background */}
       {showCelebration && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {Array.from({ length: 50 }, (_, i) => (
+          {Array.from({ length: 30 }, (_, i) => (
             <ConfettiPiece
               key={i}
               delay={i * 0.1}
@@ -96,25 +96,25 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ level, onClose }) => {
       )}
 
       {/* Main Modal */}
-      <div className="glass-card-strong rounded-3xl p-8 max-w-2xl w-full mx-auto text-center animate-bounce-in">
+      <div className="glass-card-strong rounded-2xl compact-spacing-lg max-w-xl w-full mx-auto text-center animate-bounce-in">
         {/* Header with Trophy */}
-        <div className="mb-8">
-          <div className="flex justify-center mb-6">
+        <div className="mb-6">
+          <div className="flex justify-center mb-4">
             <div className="relative">
-              <TrophyIcon className="w-24 h-24 text-yellow-400 animate-float animate-pulse-glow" />
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-full blur-2xl opacity-40 animate-pulse"></div>
+              <TrophyIcon className="w-16 h-16 text-yellow-400 animate-float animate-pulse-glow" />
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-full blur-xl opacity-40 animate-pulse"></div>
             </div>
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-black mb-4 gradient-text tracking-tight">
+          <h1 className="text-3xl md:text-4xl font-black mb-3 gradient-text tracking-tight">
             LEVEL UP!
           </h1>
 
           {/* Dynamic Message */}
-          <div className="h-16 flex items-center justify-center">
+          <div className="h-12 flex items-center justify-center">
             <div
               key={currentMessage}
-              className="text-xl md:text-2xl font-bold text-indigo-100 animate-slide-up"
+              className="text-lg md:text-xl font-bold text-indigo-100 animate-slide-up"
             >
               {celebrationMessages[currentMessage]}
             </div>
@@ -122,13 +122,13 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ level, onClose }) => {
         </div>
 
         {/* Level Information */}
-        <div className="glass-card p-6 rounded-2xl mb-8 animate-scale-in" style={{ animationDelay: '500ms' }}>
-          <div className="flex items-center justify-center space-x-4 mb-4">
-            <div className="text-5xl font-black text-yellow-300 animate-number-pop">
+        <div className="glass-card p-4 rounded-xl mb-6 animate-scale-in" style={{ animationDelay: '500ms' }}>
+          <div className="flex items-center justify-center space-x-3 mb-3">
+            <div className="text-3xl font-black text-yellow-300 animate-number-pop">
               {level}
             </div>
             <div className="text-left">
-              <div className="text-2xl font-bold text-white">
+              <div className="text-xl font-bold text-white">
                 {DIFFICULTY_NAMES[level]}
               </div>
               <div className="text-sm text-indigo-200">
@@ -137,13 +137,13 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ level, onClose }) => {
             </div>
           </div>
 
-          <div className="text-indigo-200 text-center">
+          <div className="text-indigo-200 text-center text-sm">
             {levelPerks[level as keyof typeof levelPerks]?.description}
           </div>
         </div>
 
         {/* Achievement Showcase */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-3 gap-3 mb-6">
           <AchievementBadge
             icon="🏆"
             title="Level Master"
@@ -165,27 +165,27 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ level, onClose }) => {
         </div>
 
         {/* Level Benefits */}
-        <div className="glass-card p-6 rounded-2xl mb-8 animate-slide-up" style={{ animationDelay: '1300ms' }}>
-          <h3 className="text-lg font-bold text-white mb-4 flex items-center justify-center space-x-2">
-            <SparklesIcon className="w-6 h-6 text-purple-400" />
+        <div className="glass-card p-4 rounded-xl mb-6 animate-slide-up" style={{ animationDelay: '1300ms' }}>
+          <h3 className="text-base font-bold text-white mb-3 flex items-center justify-center space-x-2">
+            <SparklesIcon className="w-5 h-5 text-purple-400" />
             <span>New Level Benefits</span>
-            <SparklesIcon className="w-6 h-6 text-purple-400" />
+            <SparklesIcon className="w-5 h-5 text-purple-400" />
           </h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div className="flex items-center space-x-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+            <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-400 rounded-full"></div>
               <span className="text-indigo-200">Higher point multiplier</span>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
               <span className="text-indigo-200">More challenging problems</span>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
               <span className="text-indigo-200">Extended thinking time</span>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
               <span className="text-indigo-200">Advanced math concepts</span>
             </div>
@@ -193,13 +193,13 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ level, onClose }) => {
         </div>
 
         {/* Progress Visualization */}
-        <div className="glass-card p-4 rounded-2xl mb-8 animate-scale-in" style={{ animationDelay: '1500ms' }}>
+        <div className="glass-card p-3 rounded-xl mb-6 animate-scale-in" style={{ animationDelay: '1500ms' }}>
           <div className="text-sm text-indigo-200 mb-2">Your Journey</div>
           <div className="flex justify-between items-center">
             {[1, 2, 3, 4, 5].map((lvl) => (
               <div key={lvl} className="flex flex-col items-center">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-500 ${
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 ${
                     lvl <= level
                       ? 'bg-gradient-to-r from-green-400 to-blue-500 text-white animate-pulse'
                       : 'bg-gray-600 text-gray-400'
@@ -218,15 +218,15 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ level, onClose }) => {
         {/* Action Button */}
         <button
           onClick={handleContinue}
-          className="group w-full btn-primary text-white font-bold py-6 px-8 rounded-2xl text-2xl shadow-2xl transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 animate-pulse-glow flex items-center justify-center space-x-3"
+          className="group w-full btn-primary text-white font-bold py-4 px-6 rounded-xl text-lg shadow-xl transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 animate-pulse-glow flex items-center justify-center space-x-3"
         >
-          <StarIcon className="w-8 h-8 group-hover:rotate-12 transition-transform" />
+          <StarIcon className="w-6 h-6 group-hover:rotate-12 transition-transform" />
           <span>Continue Challenge</span>
-          <div className="text-2xl group-hover:scale-110 transition-transform">🚀</div>
+          <div className="text-lg group-hover:scale-110 transition-transform">🚀</div>
         </button>
 
         {/* Motivation Quote */}
-        <div className="mt-6 animate-slide-up" style={{ animationDelay: '1700ms' }}>
+        <div className="mt-4 animate-slide-up" style={{ animationDelay: '1700ms' }}>
           <div className="text-sm text-indigo-300 italic">
             "Mathematics is not about numbers, equations, or algorithms. It's about understanding." 
           </div>
