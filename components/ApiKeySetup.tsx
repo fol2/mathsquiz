@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
-import { validateApiKey, setApiKey } from '../services/mathProblemService';
+import {
+  validateApiKey,
+  setApiKey,
+  getStoredApiKey,
+  clearStoredApiKey,
+} from '../services/mathProblemService';
 import LoadingSpinner from './LoadingSpinner';
 
 interface ApiKeySetupProps {
@@ -11,6 +16,7 @@ const ApiKeySetup: React.FC<ApiKeySetupProps> = ({ onComplete }) => {
   const [isValidating, setIsValidating] = useState(false);
   const [error, setError] = useState('');
   const [showInstructions, setShowInstructions] = useState(false);
+  const [storedApiKey, setStoredApiKey] = useState<string | null>(() => getStoredApiKey());
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +42,56 @@ const ApiKeySetup: React.FC<ApiKeySetupProps> = ({ onComplete }) => {
       setIsValidating(false);
     }
   };
+
+  const handleUseStored = () => {
+    if (storedApiKey) {
+      setApiKey(storedApiKey);
+      onComplete();
+    }
+  };
+
+  const handleDeleteStored = () => {
+    clearStoredApiKey();
+    setStoredApiKey(null);
+  };
+
+  if (storedApiKey) {
+    return (
+      <div className="w-full max-w-2xl mx-auto mobile-container">
+        <div className="glass-card-strong rounded-2xl p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6 animate-slide-up">
+          <div className="text-center space-y-3 sm:space-y-4">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-400 via-pink-500 to-blue-500 bg-clip-text text-transparent">
+              🧠 Math Genius Challenge
+            </h1>
+            <p className="text-base sm:text-lg md:text-xl text-indigo-100">
+              A Google Gemini API key is already stored in your browser.
+            </p>
+          </div>
+
+          {error && (
+            <div className="glass-card bg-red-500/20 border border-red-400/30 rounded-xl p-3 sm:p-4 animate-shake">
+              <p className="text-red-200 text-sm sm:text-base break-words">{error}</p>
+            </div>
+          )}
+
+          <div className="flex flex-col sm:flex-row gap-4">
+            <button
+              onClick={handleUseStored}
+              className="w-full bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 active:from-green-600 active:to-blue-700 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl text-lg sm:text-xl shadow-xl transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300 touch-target-comfortable"
+            >
+              Use Stored Key
+            </button>
+            <button
+              onClick={handleDeleteStored}
+              className="w-full bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 active:from-red-700 active:to-pink-700 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl text-lg sm:text-xl shadow-xl transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-300 touch-target-comfortable"
+            >
+              Delete Key
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-2xl mx-auto mobile-container">
@@ -153,4 +209,4 @@ const ApiKeySetup: React.FC<ApiKeySetupProps> = ({ onComplete }) => {
   );
 };
 
-export default ApiKeySetup; 
+export default ApiKeySetup;

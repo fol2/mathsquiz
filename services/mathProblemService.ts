@@ -1,5 +1,8 @@
-import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
+import { GoogleGenAI, GenerateContentResponse } from '@google/genai';
 import { MathProblem, DifficultyLevel, ProblemType, QuestionBatch } from '../types';
+
+// Storage key for persisting the API key in the browser
+const API_KEY_STORAGE_KEY = 'mathGeniusApiKey';
 
 // Store for user-provided API key
 let userApiKey: string | null = null;
@@ -12,13 +15,20 @@ const questionBatches = new Map<DifficultyLevel, QuestionBatch>();
 const BATCH_SIZE = 5;
 const BATCH_EXPIRY_TIME = 5 * 60 * 1000; // 5 minutes
 
-export const setApiKey = (apiKey: string): boolean => {
+export const setApiKey = (apiKey: string, persist = true): boolean => {
   try {
     userApiKey = apiKey.trim();
     if (userApiKey) {
       ai = new GoogleGenAI({ apiKey: userApiKey });
       // Clear existing batches when API key changes
       questionBatches.clear();
+      if (persist && typeof localStorage !== 'undefined') {
+        try {
+          localStorage.setItem(API_KEY_STORAGE_KEY, userApiKey);
+        } catch (e) {
+          console.warn('Failed to save API key:', e);
+        }
+      }
       return true;
     }
     return false;
@@ -46,6 +56,37 @@ export const validateApiKey = async (apiKey: string): Promise<boolean> => {
     console.error("API key validation failed:", error);
     return false;
   }
+};
+
+export const getStoredApiKey = (): string | null => {
+  if (typeof localStorage === 'undefined') return null;
+  try {
+    return localStorage.getItem(API_KEY_STORAGE_KEY);
+  } catch (e) {
+    console.warn('Failed to read API key from storage:', e);
+    return null;
+  }
+};
+
+export const loadApiKeyFromStorage = (): boolean => {
+  const stored = getStoredApiKey();
+  if (stored) {
+    return setApiKey(stored, false);
+  }
+  return false;
+};
+
+export const clearStoredApiKey = (): void => {
+  if (typeof localStorage !== 'undefined') {
+    try {
+      localStorage.removeItem(API_KEY_STORAGE_KEY);
+    } catch (e) {
+      console.warn('Failed to remove API key from storage:', e);
+    }
+  }
+  userApiKey = null;
+  ai = null;
+  questionBatches.clear();
 };
 
 export const hasValidApiKey = (): boolean => {
