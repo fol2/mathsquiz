@@ -1,6 +1,7 @@
 import React, { useState, useEffect, FormEvent, memo, useCallback } from 'react';
 import { MathProblem, DifficultyLevel, ProblemType } from '../types';
 import { DIFFICULTY_NAMES } from '../constants';
+import { isPositiveFeedback } from '../utils/feedback';
 import { TimerIcon, CheckCircleIcon, XCircleIcon, SparklesIcon, StarIcon, TrendingUpIcon, AlertTriangleIcon } from './Icons';
 import LoadingSpinner from './LoadingSpinner';
 import MathRenderer from './MathRenderer';
@@ -168,40 +169,7 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
   // Animation effects for correct vs incorrect answers
   useEffect(() => {
     if (isAnswerSubmitted && feedbackMessage) {
-      // More comprehensive detection of correct answer messages
-      const isCorrectAnswer = 
-        // Standard correct messages from constants.ts
-        feedbackMessage.includes('Awesome') || 
-        feedbackMessage.includes('Great') || 
-        feedbackMessage.includes('Fantastic') || 
-        feedbackMessage.includes('Super') || 
-        // Level up messages
-        feedbackMessage.includes('LEVEL UP') ||
-        feedbackMessage.includes('Woohoo') ||
-        feedbackMessage.includes('Amazing') ||
-        feedbackMessage.includes('Incredible') ||
-        // Additional variations that might appear
-        feedbackMessage.includes('math whiz') ||
-        feedbackMessage.includes('Math Genius') ||
-        feedbackMessage.includes('nailed it') ||
-        feedbackMessage.includes('Keep shining') ||
-        feedbackMessage.includes('way!') ||
-        feedbackMessage.includes('on a roll') ||
-        feedbackMessage.includes('unstoppable') ||
-        feedbackMessage.includes('unlocked') ||
-        feedbackMessage.includes('smarter') ||
-        feedbackMessage.includes('tougher questions') ||
-        // Check for positive emojis/symbols
-        feedbackMessage.includes('✨') ||
-        feedbackMessage.includes('🧠💡') ||
-        feedbackMessage.includes('⭐') ||
-        feedbackMessage.includes('🚀') ||
-        feedbackMessage.includes('🎉') ||
-        feedbackMessage.includes('🏆') ||
-        feedbackMessage.includes('🔓') ||
-        feedbackMessage.includes('🌟') ||
-        feedbackMessage.includes('🔥') ||
-        feedbackMessage.includes('🌠');
+      const isCorrectAnswer = isPositiveFeedback(feedbackMessage);
       
       console.log(`Feedback: "${feedbackMessage}" | Detected as: ${isCorrectAnswer ? 'CORRECT' : 'INCORRECT'}`);
       
@@ -254,22 +222,7 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
     setShowDrawingCanvas(prev => !prev);
   }, []);
 
-  const isFeedbackPositive = feedbackMessage && (
-    feedbackMessage.includes('Awesome') || 
-    feedbackMessage.includes('Great') || 
-    feedbackMessage.includes('Fantastic') || 
-    feedbackMessage.includes('LEVEL UP') ||
-    feedbackMessage.includes('✨') ||
-    feedbackMessage.includes('🧠💡') ||
-    feedbackMessage.includes('⭐') ||
-    feedbackMessage.includes('🚀') ||
-    feedbackMessage.includes('🎉') ||
-    feedbackMessage.includes('🏆') ||
-    feedbackMessage.includes('🔓') ||
-    feedbackMessage.includes('🌟') ||
-    feedbackMessage.includes('🔥') ||
-    feedbackMessage.includes('🌠')
-  );
+  const isFeedbackPositive = isPositiveFeedback(feedbackMessage);
 
   const getTimerClass = () => {
     if (problem?.problemType === ProblemType.ERROR_GENERATING) return 'text-gray-500';
