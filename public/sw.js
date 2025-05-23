@@ -1,20 +1,13 @@
 const CACHE_NAME = 'math-genius-v1';
-const urlsToCache = [
+
+// Files that should be pre-cached during the install step.  At runtime the
+// service worker will also cache any built assets under /assets/ as they are
+// requested.
+const PRECACHE_URLS = [
   '/',
   '/index.html',
-  '/index.tsx',
-  '/App.tsx',
-  '/types.ts',
-  '/constants.ts',
-  '/components/GameScreen.tsx',
-  '/components/StartScreen.tsx',
-  '/components/GameOverScreen.tsx',
-  '/components/LevelUpModal.tsx',
-  '/components/Icons.tsx',
-  '/components/ErrorBoundary.tsx',
-  '/components/LoadingSpinner.tsx',
-  '/services/mathProblemService.ts',
-  '/hooks/useGameProgress.ts',
+  '/manifest.json',
+  '/favicon.ico',
   '/sounds/awesome.mp3',
   '/sounds/amazing.mp3',
   '/sounds/astonishing.mp3',
@@ -27,7 +20,7 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('Opened cache');
-        return cache.addAll(urlsToCache);
+        return cache.addAll(PRECACHE_URLS);
       })
       .catch((error) => {
         console.error('Cache installation failed:', error);
@@ -37,40 +30,37 @@ self.addEventListener('install', (event) => {
 
 // Fetch event - serve from cache when offline
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version or fetch from network
-        if (response) {
-          return response;
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
+  const url = new URL(event.request.url);
+
+  // Only handle same-origin requests for app shell or built assets
+  if (url.origin === self.location.origin &&
+      (url.pathname === '/' ||
+       url.pathname === '/index.html' ||
+       url.pathname.startsWith('/assets/') ||
+       url.pathname.startsWith('/sounds/'))) {
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        if (cached) {
+          return cached;
         }
-        
-        // Clone the request for fetching
-        const fetchRequest = event.request.clone();
-        
-        return fetch(fetchRequest).then((response) => {
-          // Check if valid response
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
+        return fetch(event.request).then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
           }
-          
-          // Clone the response for caching
-          const responseToCache = response.clone();
-          
-          caches.open(CACHE_NAME)
-            .then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
-            
           return response;
         }).catch(() => {
-          // If both cache and network fail, return offline page for navigation requests
           if (event.request.mode === 'navigate') {
-            return caches.match('/');
+            return caches.match('/index.html');
           }
         });
       })
-  );
+    );
+  }
 });
 
 // Activate event - clean up old caches
