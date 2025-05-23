@@ -217,10 +217,10 @@ const App = (): React.JSX.Element => {
   }, [gameState, timeLeft, isAnswerSubmitted, handleAnswerSubmit, isLoadingProblem, currentProblem]);
 
 
-  const startGame = async (): Promise<void> => {
+  const startGame = async (level: DifficultyLevel = STARTING_LEVEL): Promise<void> => {
     setScore(0);
     setStrikes(0);
-    setCurrentLevel(STARTING_LEVEL);
+    setCurrentLevel(level);
     setQuestionsAttempted(0); 
     setCorrectAnswersCount(0);
     setGameStartTime(Date.now());
@@ -261,7 +261,7 @@ const App = (): React.JSX.Element => {
         )}
         
         {gameState === GameState.NOT_STARTED && (
-          <StartScreen 
+          <StartScreen
             onStart={startGame}
           />
         )}

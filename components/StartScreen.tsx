@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { GeniusIcon, StarIcon, TrendingUpIcon, SparklesIcon, PlayIcon } from './Icons';
+import { DifficultyLevel } from '../types';
+import { DIFFICULTY_NAMES, STARTING_LEVEL, MAX_LEVEL } from '../constants';
 
 interface StartScreenProps {
-  onStart: () => void;
+  onStart: (level: DifficultyLevel) => void;
 }
 
 const FloatingParticle: React.FC<{ delay: number; duration: number }> = ({ delay, duration }) => (
@@ -39,6 +41,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentTip, setCurrentTip] = useState(0);
   const [showInfo, setShowInfo] = useState(false);
+  const [startLevel, setStartLevel] = useState<DifficultyLevel>(STARTING_LEVEL);
 
   const tips = [
     "🎯 Get 3 correct answers in a row to level up!",
@@ -102,8 +105,25 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
 
           {/* Call to Action */}
           <div className="space-y-4">
+            <div className="max-w-sm mx-auto">
+              <label htmlFor="start-level" className="text-sm text-indigo-100 block mb-1">
+                Start at Level
+              </label>
+              <select
+                id="start-level"
+                value={startLevel}
+                onChange={(e) => setStartLevel(Number(e.target.value) as DifficultyLevel)}
+                className="w-full p-2 rounded-lg text-black"
+              >
+                {Array.from({ length: MAX_LEVEL }, (_, i) => i + 1).map(level => (
+                  <option key={level} value={level}>
+                    {DIFFICULTY_NAMES[level as DifficultyLevel]}
+                  </option>
+                ))}
+              </select>
+            </div>
             <button
-              onClick={onStart}
+              onClick={() => onStart(startLevel)}
               className="group relative w-full max-w-sm mx-auto btn-primary text-white font-bold py-4 px-6 rounded-xl text-xl shadow-xl transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 animate-pulse-glow flex items-center justify-center space-x-3"
             >
               <PlayIcon className="w-6 h-6 group-hover:scale-110 transition-transform" />
