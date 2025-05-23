@@ -146,21 +146,35 @@ Game constants can be modified in `src/constants.ts`:
 
 ## 🚢 Deployment
 
-### Netlify (Recommended)
+This app is optimized for modern hosting platforms with zero-config deployment.
+
+### Vercel (Recommended)
+📄 **See [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md) for detailed steps**
+
+Quick steps:
+1. Push code to GitHub
+2. Connect repository to Vercel
+3. Add `GEMINI_API_KEY` environment variable
+4. Deploy! ✨
+
+### Netlify
 1. Connect your GitHub repository
 2. Set build command: `npm run build`
 3. Set publish directory: `dist`
 4. Add environment variable: `GEMINI_API_KEY`
 
-### Vercel
-1. Import project from GitHub
-2. Framework preset: Vite
-3. Add environment variable: `GEMINI_API_KEY`
-
-### Manual
+### Manual Deployment
 1. Run `npm run build`
 2. Deploy `dist` folder to your web server
 3. Set environment variables on your hosting platform
+
+### Build Optimization
+The project includes:
+- ✅ Automatic code splitting
+- ✅ Terser minification  
+- ✅ Asset optimization
+- ✅ PWA support
+- ✅ Modern browser targeting
 
 ## 🤝 Contributing
 
