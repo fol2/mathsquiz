@@ -102,24 +102,26 @@ const App = (): React.JSX.Element => {
         problemToSet = nextProblemBuffer;
         setNextProblemBuffer(null);
         if (process.env.NODE_ENV === 'development') {
-          console.log("Loaded problem from PREFETCH BUFFER.", problemToSet);
+          console.warn("Loaded problem from PREFETCH BUFFER.", problemToSet);
         }
       } else {
         if (nextProblemBuffer && nextProblemBuffer.difficulty !== currentLevel) {
             if (process.env.NODE_ENV === 'development') {
-              console.log("Prefetch buffer had problem for different level, fetching new.");
+              console.warn(
+                "Prefetch buffer had problem for different level, fetching new."
+              );
             }
             setNextProblemBuffer(null);
         }
         problemToSet = await generateProblem(currentLevel);
         if (process.env.NODE_ENV === 'development') {
-          console.log(
-              problemToSet.problemType === ProblemType.AI_GENERATED 
-                  ? "Loaded problem from AI." 
-                  : problemToSet.problemType === ProblemType.ERROR_GENERATING 
-                      ? "AI generation failed - showing error."
-                      : "Loaded problem from unknown source.",
-              problemToSet
+          console.warn(
+            problemToSet.problemType === ProblemType.AI_GENERATED
+              ? 'Loaded problem from AI.'
+              : problemToSet.problemType === ProblemType.ERROR_GENERATING
+              ? 'AI generation failed - showing error.'
+              : 'Loaded problem from unknown source.',
+            problemToSet
           );
         }
       }
@@ -195,7 +197,7 @@ const App = (): React.JSX.Element => {
     }
     
     setCanProceedToNext(true);
-  }, [isAnswerSubmitted, currentProblem, currentLevel, playCorrectAnswerSound, playLevelUpSound, loadNextProblem]);
+  }, [isAnswerSubmitted, currentProblem, currentLevel, playCorrectAnswerSound, playLevelUpSound]);
 
   const proceedToNextQuestion = useCallback(async (): Promise<void> => {
     await loadNextProblem();

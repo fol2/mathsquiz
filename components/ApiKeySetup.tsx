@@ -36,7 +36,7 @@ const ApiKeySetup: React.FC<ApiKeySetupProps> = ({ onComplete }) => {
       } else {
         setError('Invalid API key. Please check your key and try again.');
       }
-    } catch (error) {
+    } catch {
       setError('Failed to validate API key. Please check your internet connection and try again.');
     } finally {
       setIsValidating(false);
