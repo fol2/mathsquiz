@@ -369,15 +369,21 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
             </div>
             
             <button
-              type="submit"
-              disabled={isAnswerSubmitted || userAnswer.trim() === '' || isLoadingProblem || !problem || problem.problemType === ProblemType.ERROR_GENERATING}
+              type={canProceedToNext ? "button" : "submit"}
+              onClick={canProceedToNext ? onProceedToNext : undefined}
+              disabled={(!canProceedToNext && (isAnswerSubmitted || userAnswer.trim() === '' || isLoadingProblem || !problem || problem.problemType === ProblemType.ERROR_GENERATING))}
               className="w-full btn-primary text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl text-lg sm:text-xl shadow-xl transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center space-x-2 sm:space-x-3 touch-target-comfortable"
-              aria-label="Submit your answer"
+              aria-label={canProceedToNext ? "Proceed to next question" : "Submit your answer"}
             >
-              {isAnswerSubmitted ? (
+              {isAnswerSubmitted && !canProceedToNext ? (
                 <>
                   <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   <span>Processing...</span>
+                </>
+              ) : canProceedToNext ? (
+                <>
+                  <span>Next Challenge</span>
+                  <div className="text-xl sm:text-2xl">🚀</div>
                 </>
               ) : (
                 <>
@@ -412,18 +418,6 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
                   The correct answer was: <span className="text-yellow-300 text-xl sm:text-2xl font-bold animate-number-pop">{problem.answer}</span>
                 </p>
               </div>
-            )}
-
-            {/* Next Question Button */}
-            {canProceedToNext && (
-              <button
-                onClick={onProceedToNext}
-                className="w-full btn-secondary text-white font-bold py-4 sm:py-6 px-6 sm:px-8 rounded-2xl text-lg sm:text-xl shadow-2xl transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-pink-300 animate-bounce-in flex items-center justify-center space-x-2 sm:space-x-3 touch-target-comfortable"
-                aria-label="Proceed to next question"
-              >
-                <span>Next Challenge</span>
-                <div className="text-xl sm:text-2xl">🚀</div>
-              </button>
             )}
           </div>
         )}
