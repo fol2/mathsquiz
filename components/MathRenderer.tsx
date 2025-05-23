@@ -80,4 +80,4 @@ const MathRenderer: React.FC<MathRendererProps> = ({
   }
 };
 
-export default MathRenderer; 
+export default MathRenderer;
