@@ -117,8 +117,8 @@ const App = (): React.JSX.Element => {
               problemToSet.problemType === ProblemType.AI_GENERATED 
                   ? "Loaded problem from AI." 
                   : problemToSet.problemType === ProblemType.ERROR_GENERATING 
-                      ? "Loaded problem: FALLBACK (AI error)."
-                      : "Loaded problem from local static generator.",
+                      ? "AI generation failed - showing error."
+                      : "Loaded problem from unknown source.",
               problemToSet
           );
         }

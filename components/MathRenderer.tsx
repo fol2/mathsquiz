@@ -1,140 +1,83 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
-
-// Import KaTeX directly since react-katex might not be available
-declare const katex: {
-  render: (tex: string, element: Element, options?: any) => void;
-  renderToString: (tex: string, options?: any) => string;
-};
 
 interface MathRendererProps {
   children: string;
-  inline?: boolean;
   className?: string;
 }
 
-const MathRenderer: React.FC<MathRendererProps> = ({ children, inline = true, className = '' }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Load KaTeX dynamically
-  useEffect(() => {
-    const loadKatex = async () => {
-      if (typeof window !== 'undefined' && !window.katex) {
-        try {
-          // Load KaTeX from CDN
-          const script = document.createElement('script');
-          script.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js';
-          script.onload = () => {
-            renderMath();
-          };
-          document.head.appendChild(script);
-        } catch (error) {
-          console.warn('Failed to load KaTeX:', error);
-        }
-      } else {
-        renderMath();
-      }
-    };
-
-    loadKatex();
-  }, [children]);
-
-  const renderMath = () => {
-    if (!containerRef.current || typeof window === 'undefined' || !window.katex) {
-      return;
-    }
-
-    try {
-      const text = children;
-      const container = containerRef.current;
-      
-      // Clear previous content
-      container.innerHTML = '';
-
-      // Simple math detection and rendering
-      const mathPattern = /\$\$(.*?)\$\$|\\\[(.*?)\\\]|\$(.*?)\$|\\\((.*?)\\\)/g;
-      let lastIndex = 0;
-      let match;
-
-      while ((match = mathPattern.exec(text)) !== null) {
-        // Add text before math
-        if (match.index > lastIndex) {
-          const textSpan = document.createElement('span');
-          textSpan.textContent = text.slice(lastIndex, match.index);
-          container.appendChild(textSpan);
-        }
-
-        // Render math
-        const mathContent = match[1] || match[2] || match[3] || match[4];
-        const isBlock = match[1] || match[2]; // $$ or \[
-        
-        const mathElement = document.createElement(isBlock ? 'div' : 'span');
-        if (isBlock) {
-          mathElement.style.textAlign = 'center';
-          mathElement.style.margin = '10px 0';
-        }
-
-        try {
-          window.katex.render(mathContent, mathElement, {
-            displayMode: isBlock,
-            throwOnError: false,
-            errorColor: '#cc0000',
-          });
-        } catch (err) {
-          // Fallback to plain text if KaTeX fails
-          mathElement.textContent = `$${mathContent}$`;
-        }
-
-        container.appendChild(mathElement);
-        lastIndex = match.index + match[0].length;
-      }
-
-      // Add remaining text
-      if (lastIndex < text.length) {
-        const textSpan = document.createElement('span');
-        textSpan.textContent = text.slice(lastIndex);
-        container.appendChild(textSpan);
-      }
-
-    } catch (error) {
-      console.warn('Error rendering math:', error);
-      // Fallback to plain text
-      if (containerRef.current) {
-        containerRef.current.textContent = children;
-      }
-    }
-  };
-
-  // Simple fallback for when KaTeX is not available
-  const SimpleMathRenderer = ({ text }: { text: string }) => {
-    // Convert simple LaTeX to Unicode equivalents
-    const convertedText = text
-      .replace(/\\frac\{(\d+)\}\{(\d+)\}/g, '$1/$2')
-      .replace(/\^2/g, '²')
-      .replace(/\^3/g, '³')
-      .replace(/\\sqrt\{([^}]+)\}/g, '√($1)')
-      .replace(/\\times/g, '×')
-      .replace(/\\div/g, '÷')
-      .replace(/\\pm/g, '±')
-      .replace(/\$\$(.*?)\$\$/g, '$1')
-      .replace(/\$(.*?)\$/g, '$1');
+const MathRenderer: React.FC<MathRendererProps> = ({ 
+  children, 
+  className = '' 
+}) => {
+  // Convert various LaTeX formats to markdown math syntax
+  const normalizeLatexForMarkdown = (latex: string): string => {
+    let normalized = latex.trim();
     
-    return <span>{convertedText}</span>;
+    // If it already has proper markdown math delimiters, return as is
+    if (normalized.includes('$')) {
+      return normalized;
+    }
+    
+    // Check for complex expressions that should be display math
+    const isComplexExpression = [
+      /\\frac\{[^}]*\}\{[^}]*\}/, // Fractions
+      /\\int/, // Integrals
+      /\\sum/, // Summations
+      /\\prod/, // Products
+      /\\lim/, // Limits
+      /\\begin\{/, // Matrix/array environments
+      /\\sqrt\{[^}]{8,}\}/, // Complex square roots
+      /_{[^}]{4,}}/, // Complex subscripts
+      /\^{[^}]{4,}}/, // Complex superscripts
+    ].some(pattern => pattern.test(normalized));
+    
+    // Add appropriate math delimiters
+    if (isComplexExpression) {
+      return `$$${normalized}$$`; // Block math
+    } else {
+      return `$${normalized}$`; // Inline math
+    }
   };
 
-  return (
-    <div className={className}>
-      <div ref={containerRef}>
-        <SimpleMathRenderer text={children} />
-      </div>
-    </div>
-  );
-};
+  const markdownWithMath = normalizeLatexForMarkdown(children);
 
-declare global {
-  interface Window {
-    katex: typeof katex;
+  try {
+    return (
+      <div className={`math-renderer ${className}`}>
+        <ReactMarkdown
+          remarkPlugins={[remarkMath]}
+          rehypePlugins={[rehypeKatex]}
+          components={{
+            // Override paragraph to avoid extra wrapping when not needed
+            p: ({ children }) => <span>{children}</span>,
+            // Handle any other elements that might appear
+            div: ({ children }) => <div>{children}</div>,
+          }}
+        >
+          {markdownWithMath}
+        </ReactMarkdown>
+      </div>
+    );
+  } catch (error) {
+    console.warn('Math rendering error:', error);
+    return (
+      <span className={`math-error ${className}`} style={{ 
+        color: '#e74c3c', 
+        fontFamily: 'monospace',
+        fontSize: '0.9em',
+        border: '1px solid #e74c3c',
+        padding: '2px 4px',
+        borderRadius: '3px',
+        backgroundColor: 'rgba(231, 76, 60, 0.1)'
+      }}>
+        Math Error: {children}
+      </span>
+    );
   }
-}
+};
 
 export default MathRenderer; 

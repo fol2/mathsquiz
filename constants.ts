@@ -1,8 +1,7 @@
-
 import { DifficultyLevel } from './types';
 
 export const STARTING_LEVEL: DifficultyLevel = DifficultyLevel.LEVEL_1;
-export const MAX_LEVEL: DifficultyLevel = DifficultyLevel.LEVEL_5;
+export const MAX_LEVEL: DifficultyLevel = DifficultyLevel.LEVEL_20;
 export const STRIKES_TO_LEVEL_UP: number = 3;
 export const INITIAL_TIME_PER_QUESTION: number = 30; // seconds (Increased from 20)
 export const TIME_INCREMENT_PER_LEVEL: number = 3; // seconds (Was TIME_DECREMENT_PER_LEVEL, now time increases)
@@ -33,9 +32,24 @@ export const LEVEL_UP_MESSAGES: string[] = [
 ];
 
 export const DIFFICULTY_NAMES: Record<DifficultyLevel, string> = {
-    [DifficultyLevel.LEVEL_1]: "Explorer",
-    [DifficultyLevel.LEVEL_2]: "Solver",
-    [DifficultyLevel.LEVEL_3]: "Strategist",
-    [DifficultyLevel.LEVEL_4]: "Virtuoso",
-    [DifficultyLevel.LEVEL_5]: "Genius"
+    [DifficultyLevel.LEVEL_1]: "Little Explorer (Age 7)",
+    [DifficultyLevel.LEVEL_2]: "Number Friend (Age 8)",
+    [DifficultyLevel.LEVEL_3]: "Math Detective (Age 9)",
+    [DifficultyLevel.LEVEL_4]: "Problem Solver (Age 10)",
+    [DifficultyLevel.LEVEL_5]: "Math Adventurer (Age 11)",
+    [DifficultyLevel.LEVEL_6]: "Equation Explorer (Age 12)",
+    [DifficultyLevel.LEVEL_7]: "Algebra Apprentice (Age 13)",
+    [DifficultyLevel.LEVEL_8]: "Math Navigator (Age 14)",
+    [DifficultyLevel.LEVEL_9]: "Formula Fighter (Age 15)",
+    [DifficultyLevel.LEVEL_10]: "Geometry Guardian (Age 16)",
+    [DifficultyLevel.LEVEL_11]: "Calculus Cadet (Age 17)",
+    [DifficultyLevel.LEVEL_12]: "Math Strategist (Age 18)",
+    [DifficultyLevel.LEVEL_13]: "Advanced Analyst (Age 19)",
+    [DifficultyLevel.LEVEL_14]: "Mathematical Mind (Age 20)",
+    [DifficultyLevel.LEVEL_15]: "Logic Master (Age 21)",
+    [DifficultyLevel.LEVEL_16]: "Theory Tactician (Age 22)",
+    [DifficultyLevel.LEVEL_17]: "Abstract Ace (Age 23)",
+    [DifficultyLevel.LEVEL_18]: "Mathematical Maestro (Age 24)",
+    [DifficultyLevel.LEVEL_19]: "Research Researcher (Age 25)",
+    [DifficultyLevel.LEVEL_20]: "Mathematics Scholar (MSc Level)"
 };

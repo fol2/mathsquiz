@@ -53,131 +53,54 @@ export const hasValidApiKey = (): boolean => {
 };
 
 const getDifficultyDescription = (level: DifficultyLevel): string => {
-  switch (level) {
-    case DifficultyLevel.LEVEL_1: return "very basic arithmetic (addition, subtraction, multiplication, division) with small positive integers. Single step.";
-    case DifficultyLevel.LEVEL_2: return "simple algebra (e.g., find x in 2x + 3 = 7 or x/3 - 1 = 4) or slightly harder arithmetic. Single or two steps.";
-    case DifficultyLevel.LEVEL_3: return "problems involving fractions, decimals, or percentages. May include simple word problems. Up to two or three steps.";
-    case DifficultyLevel.LEVEL_4: return "basic geometry (area, perimeter of simple shapes like rectangles or squares), multi-step arithmetic, or intermediate word problems (e.g., rate/time/distance, simple ratios).";
-    case DifficultyLevel.LEVEL_5: return "advanced algebra (multi-step equations, possibly with variables on both sides), or more complex multi-step word problems requiring careful reading.";
-    default: return "general math for a 13-14 year old.";
+  const age = level + 6; // Level 1 = Age 7, Level 2 = Age 8, etc.
+  
+  if (age <= 10) {
+    return `age ${age} elementary school level math. Focus on basic arithmetic, simple number operations, and foundational concepts appropriate for a ${age}-year-old child.`;
+  } else if (age <= 14) {
+    return `age ${age} middle school level math. Include pre-algebra, basic geometry, fractions, decimals, percentages, and word problems suitable for a ${age}-year-old student.`;
+  } else if (age <= 18) {
+    return `age ${age} high school level math. Cover algebra, geometry, trigonometry, and advanced mathematical concepts appropriate for a ${age}-year-old high school student.`;
+  } else if (age <= 22) {
+    return `age ${age} undergraduate college level math. Include calculus, linear algebra, statistics, and university-level mathematical concepts suitable for a ${age}-year-old college student.`;
+  } else {
+    return `age ${age} graduate/MSc level mathematics. Focus on advanced mathematical theory, complex analysis, abstract algebra, and research-level mathematical concepts appropriate for graduate studies.`;
   }
 };
 
 const getTopicHints = (level: DifficultyLevel): string[] => {
-  const topicsByLevel: Record<DifficultyLevel, string[]> = {
-    [DifficultyLevel.LEVEL_1]: ["addition", "subtraction", "multiplication", "division", "basic number operations"],
-    [DifficultyLevel.LEVEL_2]: ["simple algebra with x", "order of operations", "two-step arithmetic", "basic equations"],
-    [DifficultyLevel.LEVEL_3]: ["fractions operations", "decimal operations", "percentage calculations", "basic word problems", "mixed numbers"],
-    [DifficultyLevel.LEVEL_4]: ["area of rectangles", "perimeter of rectangles", "rate-time-distance problems", "ratio and proportion problems", "circles and basic geometry"],
-    [DifficultyLevel.LEVEL_5]: ["multi-step algebraic equations", "complex word problems involving multiple operations", "geometry word problems", "quadratic expressions", "systems of simple equations"],
-  };
-  return topicsByLevel[level] || topicsByLevel[DifficultyLevel.LEVEL_1];
+  const age = level + 6; // Level 1 = Age 7, etc.
+  
+  if (age <= 8) {
+    return ["counting", "addition", "subtraction", "simple number recognition", "basic shapes"];
+  } else if (age <= 10) {
+    return ["multiplication", "division", "basic fractions", "time", "money", "measurement"];
+  } else if (age <= 12) {
+    return ["decimals", "percentages", "area", "perimeter", "basic algebra", "simple equations"];
+  } else if (age <= 14) {
+    return ["linear equations", "coordinate geometry", "probability", "statistics", "ratio and proportion"];
+  } else if (age <= 16) {
+    return ["quadratic equations", "functions", "trigonometry basics", "exponentials", "logarithms"];
+  } else if (age <= 18) {
+    return ["advanced trigonometry", "calculus introduction", "sequences and series", "complex numbers"];
+  } else if (age <= 20) {
+    return ["differential calculus", "integral calculus", "linear algebra", "discrete mathematics"];
+  } else if (age <= 22) {
+    return ["multivariable calculus", "differential equations", "abstract algebra", "real analysis"];
+  } else {
+    return ["topology", "functional analysis", "measure theory", "advanced number theory", "algebraic geometry"];
+  }
 };
 
-const generateBetterFallbackProblem = (level: DifficultyLevel): MathProblem => {
-  console.warn(`Using improved fallback problem generator for level ${level}.`);
-  
-  const fallbacksByLevel: Record<DifficultyLevel, () => MathProblem> = {
-    [DifficultyLevel.LEVEL_1]: () => {
-      const a = Math.floor(Math.random() * 20) + 1;
-      const b = Math.floor(Math.random() * 15) + 1;
-      const operations = [
-        { op: '+', question: `\\text{What is } ${a} + ${b}\\text{?}`, answer: a + b },
-        { op: '-', question: `\\text{What is } ${Math.max(a, b)} - ${Math.min(a, b)}\\text{?}`, answer: Math.max(a, b) - Math.min(a, b) },
-        { op: '×', question: `\\text{What is } ${Math.min(a, 10)} \\times ${Math.min(b, 8)}\\text{?}`, answer: Math.min(a, 10) * Math.min(b, 8) },
-        { op: '÷', question: `\\text{What is } ${a * b} \\div ${b}\\text{?}`, answer: a },
-      ];
-      const chosen = operations[Math.floor(Math.random() * operations.length)];
-      return {
-        id: `fallback-L1-${Date.now()}`,
-        questionText: chosen.question,
-        answer: chosen.answer,
-        difficulty: level,
-        problemType: ProblemType.ERROR_GENERATING,
-        hasLatex: true,
-      };
-    },
-    
-    [DifficultyLevel.LEVEL_2]: () => {
-      const x = Math.floor(Math.random() * 10) + 1;
-      const a = Math.floor(Math.random() * 5) + 2;
-      const b = Math.floor(Math.random() * 20) + 1;
-      const equations = [
-        { question: `\\text{Solve for } x\\text{: } ${a}x + ${b} = ${a * x + b}`, answer: x },
-        { question: `\\text{Find } x\\text{: } \\frac{x}{${a}} + ${b} = ${Math.floor(x/a) + b}`, answer: x },
-        { question: `\\text{What is } x \\text{ if } ${a}x - ${b} = ${a * x - b}\\text{?}`, answer: x },
-      ];
-      const chosen = equations[Math.floor(Math.random() * equations.length)];
-      return {
-        id: `fallback-L2-${Date.now()}`,
-        questionText: chosen.question,
-        answer: chosen.answer,
-        difficulty: level,
-        problemType: ProblemType.ERROR_GENERATING,
-        hasLatex: true,
-      };
-    },
-    
-    [DifficultyLevel.LEVEL_3]: () => {
-      const problems = [
-        { question: "\\text{What is } \\frac{1}{2} + \\frac{1}{4}\\text{?}", answer: 0.75 },
-        { question: "\\text{What is } 0.5 \\times 6\\text{?}", answer: 3 },
-        { question: "\\text{What is } 25\\% \\text{ of } 80\\text{?}", answer: 20 },
-        { question: "\\text{Convert } \\frac{3}{4} \\text{ to a decimal}", answer: 0.75 },
-        { question: "\\text{What is } 2.5 + 1.75\\text{?}", answer: 4.25 },
-      ];
-      const chosen = problems[Math.floor(Math.random() * problems.length)];
-      return {
-        id: `fallback-L3-${Date.now()}`,
-        questionText: chosen.question,
-        answer: chosen.answer,
-        difficulty: level,
-        problemType: ProblemType.ERROR_GENERATING,
-        hasLatex: true,
-      };
-    },
-    
-    [DifficultyLevel.LEVEL_4]: () => {
-      const length = Math.floor(Math.random() * 10) + 5;
-      const width = Math.floor(Math.random() * 8) + 3;
-      const problems = [
-        { question: `\\text{What is the area of a rectangle with length } ${length} \\text{ and width } ${width}\\text{?}`, answer: length * width },
-        { question: `\\text{What is the perimeter of a rectangle with length } ${length} \\text{ and width } ${width}\\text{?}`, answer: 2 * (length + width) },
-        { question: `\\text{A car travels } 60 \\text{ km/h for } 2 \\text{ hours. How far does it travel?}`, answer: 120 },
-        { question: `\\text{If } 3 \\text{ apples cost } \\$6\\text{, how much do } 5 \\text{ apples cost?}`, answer: 10 },
-      ];
-      const chosen = problems[Math.floor(Math.random() * problems.length)];
-      return {
-        id: `fallback-L4-${Date.now()}`,
-        questionText: chosen.question,
-        answer: chosen.answer,
-        difficulty: level,
-        problemType: ProblemType.ERROR_GENERATING,
-        hasLatex: true,
-      };
-    },
-    
-    [DifficultyLevel.LEVEL_5]: () => {
-      const x = Math.floor(Math.random() * 8) + 2;
-      const problems = [
-        { question: `\\text{Solve: } 3x + 7 = 2x + 15`, answer: 8 },
-        { question: `\\text{Find } x\\text{: } 2(x + 3) = 18`, answer: 6 },
-        { question: `\\text{What is } x \\text{ if } x^2 - 9 = 16\\text{?}`, answer: 5 },
-        { question: `\\text{If } y = 2x + 1 \\text{ and } y = 7\\text{, what is } x\\text{?}`, answer: 3 },
-      ];
-      const chosen = problems[Math.floor(Math.random() * problems.length)];
-      return {
-        id: `fallback-L5-${Date.now()}`,
-        questionText: chosen.question,
-        answer: chosen.answer,
-        difficulty: level,
-        problemType: ProblemType.ERROR_GENERATING,
-        hasLatex: true,
-      };
-    },
+const generateErrorProblem = (level: DifficultyLevel, errorMessage: string = "Unable to generate AI question"): MathProblem => {
+  return {
+    id: `error-${level}-${Date.now()}`,
+    questionText: errorMessage,
+    answer: 0,
+    difficulty: level,
+    problemType: ProblemType.ERROR_GENERATING,
+    hasLatex: false,
   };
-
-  return fallbacksByLevel[level]();
 };
 
 const generateQuestionBatch = async (level: DifficultyLevel): Promise<QuestionBatch> => {
@@ -185,37 +108,56 @@ const generateQuestionBatch = async (level: DifficultyLevel): Promise<QuestionBa
     throw new Error("AI client not initialized");
   }
 
+  const age = level + 6; // Level 1 = Age 7, etc.
   const difficultyDescription = getDifficultyDescription(level);
   const topics = getTopicHints(level);
   
+  const educationalLevel = age <= 10 ? "elementary school" : 
+                          age <= 14 ? "middle school" : 
+                          age <= 18 ? "high school" : 
+                          age <= 22 ? "undergraduate university" : 
+                          "graduate/MSc level";
+  
   const prompt = `
-You are a math question generator. Create exactly ${BATCH_SIZE} diverse math problems suitable for Year 9 students (13-14 years old).
+You are an expert mathematics educator creating ${BATCH_SIZE} diverse math problems for ${educationalLevel} level.
 
-Difficulty Level: "${difficultyDescription}"
-Topics to include (use variety): ${topics.join(', ')}
+Target Age: ${age} years old
+Educational Context: ${difficultyDescription}
+Mathematical Topics: ${topics.join(', ')}
 
 Requirements:
-1. Generate exactly ${BATCH_SIZE} different problems
-2. Each problem should have different topics/approaches
-3. Include some problems that benefit from LaTeX formatting (fractions, equations, etc.)
-4. Answer must be a single numerical value
-5. Problems should be clear and solvable
+1. Generate exactly ${BATCH_SIZE} different problems appropriate for a ${age}-year-old student
+2. Each problem should cover different mathematical concepts from the topic list
+3. Problems should be challenging but achievable for the target age
+4. Use LaTeX formatting for mathematical expressions (fractions, equations, symbols, etc.)
+5. Each answer must be a single numerical value (integer or decimal)
+6. Ensure problems are educationally appropriate and engaging
+
+Examples of LaTeX formatting:
+- Fractions: \\\\frac{3}{4}, \\\\frac{x+1}{2}
+- Exponents: x^2, 2^3, e^x
+- Square roots: \\\\sqrt{16}, \\\\sqrt{x^2 + 1}
+- Greek letters: \\\\pi, \\\\theta, \\\\alpha
+- Integrals: \\\\int_0^1 x^2 \\, dx
+- Matrices: \\\\begin{pmatrix} a & b \\\\ c & d \\\\end{pmatrix}
+- Limits: \\\\lim_{x \\to 0} \\\\frac{\\\\sin x}{x}
+
+Age-specific guidelines:
+${age <= 10 ? "- Use concrete, visual problems with small numbers\n- Include real-world contexts (toys, animals, food)\n- Keep language simple and clear" :
+  age <= 14 ? "- Include word problems with relatable scenarios\n- Introduce abstract thinking gradually\n- Use moderate computational complexity" :
+  age <= 18 ? "- Include advanced mathematical concepts and notation\n- Problems can be multi-step and require deeper reasoning\n- Use mathematical terminology appropriately" :
+  age <= 22 ? "- Include university-level mathematical rigor\n- Problems should demonstrate understanding of advanced concepts\n- Use formal mathematical language and notation" :
+  "- Include graduate-level mathematical sophistication\n- Problems should require deep mathematical insight\n- Use advanced mathematical theory and abstract concepts"}
 
 Response format (JSON array):
 [
   {
-    "questionText": "Question here (use LaTeX for math expressions like \\\\frac{1}{2} or x^2)",
-    "answer": 42,
+    "questionText": "Question here with proper LaTeX formatting",
+    "answer": 42.5,
     "hasLatex": true
   },
   ...
 ]
-
-Examples of LaTeX usage:
-- Fractions: \\\\frac{3}{4}
-- Exponents: x^2, 2^3
-- Square roots: \\\\sqrt{16}
-- Equations: 2x + 3 = 7
 
 Generate ${BATCH_SIZE} problems now:
 `;
@@ -226,7 +168,8 @@ Generate ${BATCH_SIZE} problems now:
       contents: prompt,
       config: {
         responseMimeType: "application/json",
-        maxOutputTokens: 2048,
+        maxOutputTokens: 3072, // Increased for more complex problems
+        temperature: 0.8, // Add some creativity
       }
     });
     
@@ -305,8 +248,7 @@ const prefetchBatch = async (level: DifficultyLevel): Promise<void> => {
 
 export const generateProblem = async (level: DifficultyLevel): Promise<MathProblem> => {
   if (!hasValidApiKey()) {
-    console.warn("No valid API key available, using fallback problem");
-    return generateBetterFallbackProblem(level);
+    return generateErrorProblem(level, "No API key configured. Please set up your Google AI API key.");
   }
 
   // Try to get from existing batch first
@@ -335,8 +277,8 @@ export const generateProblem = async (level: DifficultyLevel): Promise<MathProbl
     
     return question;
   } catch (error) {
-    console.error("Failed to generate AI problem, using fallback:", error);
-    return generateBetterFallbackProblem(level);
+    console.error("Failed to generate AI problem:", error);
+    return generateErrorProblem(level, "Failed to generate AI question. Please check your connection.");
   }
 };
 

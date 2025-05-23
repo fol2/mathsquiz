@@ -157,10 +157,10 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
               <div className="text-red-300 flex flex-col items-center gap-2">
                   <AlertTriangleIcon className="w-8 h-8" />
                   <p className="text-lg font-semibold">{problem.questionText}</p>
-                  <p className="text-sm">A new question will be fetched shortly.</p>
+                  <p className="text-sm">Click "Next Question" to try again.</p>
               </div>
           ) : problem ? (
-            <div id="question-text" className="text-2xl md:text-3xl font-bold text-white break-words" role="heading" aria-level={2}>
+            <div key={problem.id} id="question-text" className="text-2xl md:text-3xl font-bold text-white break-words" role="heading" aria-level={2}>
               {problem.hasLatex ? (
                 <MathRenderer className="text-center">{problem.questionText}</MathRenderer>
               ) : (
@@ -227,7 +227,7 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
               {problem.problemType === ProblemType.AI_GENERATED 
                 ? '🤖 AI Generated' 
                 : problem.problemType === ProblemType.ERROR_GENERATING
-                ? '⚠️ Fallback Question'
+                ? '❌ AI Error'
                 : '📚 Question Bank'}
             </div>
           </div>

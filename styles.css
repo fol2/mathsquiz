@@ -1,8 +1,5 @@
 @import "tailwindcss";
 
-/* Custom font for a more playful/educational feel */
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap');
-
 body {
   font-family: 'Nunito', sans-serif;
   overscroll-behavior: none; /* Prevents pull-to-refresh on mobile */
@@ -46,8 +43,62 @@ body {
 /* KaTeX styling adjustments */
 .katex {
   font-size: 1.1em;
+  color: inherit;
 }
 
 .katex-display {
   margin: 1em 0;
+  text-align: center;
+}
+
+/* Math renderer component styling */
+.math-renderer {
+  display: inline-block;
+  color: inherit;
+}
+
+.math-renderer .katex {
+  color: inherit;
+}
+
+.math-renderer .katex-display {
+  margin: 0.5em 0;
+}
+
+/* Math error styling */
+.math-error {
+  display: inline-block;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* Ensure math renders properly in different contexts */
+.katex .katex-html {
+  color: inherit;
+}
+
+/* Better font rendering for math */
+.katex .katex-mathml {
+  position: absolute;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 0;
+  border: 0;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+}
+
+/* Responsive math scaling */
+@media (max-width: 640px) {
+  .katex {
+    font-size: 1.0em;
+  }
+  
+  .katex-display {
+    margin: 0.75em 0;
+  }
+  
+  .math-renderer .katex-display {
+    margin: 0.5em 0;
+  }
 } 
