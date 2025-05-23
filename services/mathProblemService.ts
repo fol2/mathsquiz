@@ -92,6 +92,33 @@ const getTopicHints = (level: DifficultyLevel): string[] => {
   }
 };
 
+const AGE_GUIDELINES: Record<DifficultyLevel, string> = {
+  [DifficultyLevel.LEVEL_1]: "- Use colourful objects and small numbers\n- Keep language short and playful\n- Relate to toys or pets",
+  [DifficultyLevel.LEVEL_2]: "- Include basic addition and subtraction\n- Use everyday scenarios like snacks or games\n- Keep numbers under 20",
+  [DifficultyLevel.LEVEL_3]: "- Introduce multiplication with small numbers\n- Provide contexts such as school or sports\n- Encourage counting strategies",
+  [DifficultyLevel.LEVEL_4]: "- Mix multiplication, division and simple fractions\n- Use relatable word problems\n- Keep sentences clear",
+  [DifficultyLevel.LEVEL_5]: "- Incorporate decimals and multi-step reasoning\n- Introduce geometry concepts and measurement\n- Encourage estimation",
+  [DifficultyLevel.LEVEL_6]: "- Use pre-algebra with simple variables\n- Provide puzzle-style questions with diagrams\n- Encourage reasoning steps",
+  [DifficultyLevel.LEVEL_7]: "- Include algebraic expressions, ratios and proportions\n- Use scenario-based word problems\n- Challenge with logical steps",
+  [DifficultyLevel.LEVEL_8]: "- Introduce linear equations and coordinate geometry\n- Encourage problem-solving strategies\n- Provide multi-step calculations",
+  [DifficultyLevel.LEVEL_9]: "- Use quadratic equations and basic trigonometry\n- Provide modelling tasks or story problems\n- Encourage explanation of reasoning",
+  [DifficultyLevel.LEVEL_10]: "- Combine algebra with advanced geometry or early calculus\n- Use challenging multi-part problems\n- Employ precise mathematical language",
+  [DifficultyLevel.LEVEL_11]: "- Introduce calculus topics like limits and derivatives\n- Encourage formal reasoning\n- Use advanced notation",
+  [DifficultyLevel.LEVEL_12]: "- Cover integration, sequences and complex numbers\n- Provide multi-step proofs or derivations\n- Encourage deeper connections",
+  [DifficultyLevel.LEVEL_13]: "- Include discrete math or advanced algebraic structures\n- Use short proof-style problems\n- Emphasise mathematical rigour",
+  [DifficultyLevel.LEVEL_14]: "- Explore advanced calculus or real analysis\n- Use formal notation and multi-stage reasoning\n- Encourage critical thinking",
+  [DifficultyLevel.LEVEL_15]: "- Integrate linear algebra, statistics or discrete math\n- Present open-ended problems requiring creativity\n- Encourage connections across topics",
+  [DifficultyLevel.LEVEL_16]: "- Use abstract algebra or advanced calculus\n- Expect formal argumentation and detailed proofs\n- Focus on conceptual understanding",
+  [DifficultyLevel.LEVEL_17]: "- Embrace topology, combinatorics or complex analysis\n- Provide research-style questions\n- Encourage novel approaches",
+  [DifficultyLevel.LEVEL_18]: "- Cover complex analysis, advanced algebra or number theory\n- Present problems requiring deep insight\n- Encourage theoretical reasoning",
+  [DifficultyLevel.LEVEL_19]: "- Include measure theory or functional analysis\n- Provide challenging proof-oriented tasks\n- Expect precision and rigour",
+  [DifficultyLevel.LEVEL_20]: "- Present graduate-level, research-based problems\n- Encourage original solutions and exploration\n- Use formal proofs and abstract concepts",
+};
+
+const getAgeGuidelines = (level: DifficultyLevel): string => {
+  return AGE_GUIDELINES[level];
+};
+
 const generateErrorProblem = (level: DifficultyLevel, errorMessage: string = "Unable to generate AI question"): MathProblem => {
   return {
     id: `error-${level}-${Date.now()}`,
@@ -143,11 +170,7 @@ Examples of LaTeX formatting:
 - Limits: \\\\lim_{x \\to 0} \\\\frac{\\\\sin x}{x}
 
 Age-specific guidelines:
-${age <= 10 ? "- Use concrete, visual problems with small numbers\n- Include real-world contexts (toys, animals, food)\n- Keep language simple and clear" :
-  age <= 14 ? "- Include word problems with relatable scenarios\n- Introduce abstract thinking gradually\n- Use moderate computational complexity" :
-  age <= 18 ? "- Include advanced mathematical concepts and notation\n- Problems can be multi-step and require deeper reasoning\n- Use mathematical terminology appropriately" :
-  age <= 22 ? "- Include university-level mathematical rigor\n- Problems should demonstrate understanding of advanced concepts\n- Use formal mathematical language and notation" :
-  "- Include graduate-level mathematical sophistication\n- Problems should require deep mathematical insight\n- Use advanced mathematical theory and abstract concepts"}
+${getAgeGuidelines(level)}
 
 Response format (JSON array):
 [
@@ -169,7 +192,7 @@ Generate ${BATCH_SIZE} problems now:
       config: {
         responseMimeType: "application/json",
         maxOutputTokens: 3072, // Increased for more complex problems
-        temperature: 0.8, // Add some creativity
+        temperature: 1.1, // Encourage more creative questions
       }
     });
     
