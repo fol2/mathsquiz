@@ -51,6 +51,18 @@
   }
 }
 
+@supports (height: 100svh) {
+  :root {
+    --full-height: 100svh;
+  }
+}
+
+@supports (height: 100lvh) {
+  :root {
+    --visual-height: 100lvh;
+  }
+}
+
 /* Keyboard-aware layout using CSS environment variables */
 @supports (padding-bottom: env(keyboard-inset-height)) {
   .keyboard-aware {
@@ -72,6 +84,7 @@ html {
 body {
   font-family: 'Inter', 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   overscroll-behavior: none;
+  overflow-x: hidden;
   transition: background-color var(--transition-medium) ease, color var(--transition-medium) ease;
   line-height: 1.6;
   letter-spacing: -0.01em;

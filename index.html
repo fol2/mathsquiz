@@ -57,10 +57,24 @@
             document.documentElement.style.setProperty('--vvh', `${vvh}px`);
             document.documentElement.style.setProperty('--keyboard-height', `${window.innerHeight - window.visualViewport.height}px`);
           }
-          
+
           updateViewport();
           window.visualViewport.addEventListener('resize', updateViewport);
         }
+
+        // Fallback polling for browsers where resize events don't fire
+        let lastHeight = window.innerHeight;
+        setInterval(() => {
+          if (window.innerHeight !== lastHeight) {
+            lastHeight = window.innerHeight;
+            setVHProperty();
+            if (window.visualViewport) {
+              const vvh = window.visualViewport.height * 0.01;
+              document.documentElement.style.setProperty('--vvh', `${vvh}px`);
+              document.documentElement.style.setProperty('--keyboard-height', `${window.innerHeight - window.visualViewport.height}px`);
+            }
+          }
+        }, 500);
       })();
     </script>
   </head>
