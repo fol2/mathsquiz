@@ -9,38 +9,22 @@ interface MathRendererProps {
   className?: string;
 }
 
-const MathRenderer: React.FC<MathRendererProps> = ({ 
-  children, 
-  className = '' 
-}) => {
-  // Convert various LaTeX formats to markdown math syntax
-  const normalizeLatexForMarkdown = (latex: string): string => {
-    const normalized = latex.trim();
-    
-    // If it already has proper markdown math delimiters, return as is
+const MathRenderer: React.FC<MathRendererProps> = ({ children, className = '' }) => {
+  // Convert AI generated LaTeX (which often lacks `$` delimiters) to markdown
+  // with proper inline math segments while keeping surrounding text intact.
+  const normalizeLatexForMarkdown = (text: string): string => {
+    const normalized = text.trim();
+
+    // If markdown math delimiters already exist, just return the text
     if (normalized.includes('$')) {
       return normalized;
     }
-    
-    // Check for complex expressions that should be display math
-    const isComplexExpression = [
-      /\\frac\{[^}]*\}\{[^}]*\}/, // Fractions
-      /\\int/, // Integrals
-      /\\sum/, // Summations
-      /\\prod/, // Products
-      /\\lim/, // Limits
-      /\\begin\{/, // Matrix/array environments
-      /\\sqrt\{[^}]{8,}\}/, // Complex square roots
-      /_{[^}]{4,}}/, // Complex subscripts
-      /\^{[^}]{4,}}/, // Complex superscripts
-    ].some(pattern => pattern.test(normalized));
-    
-    // Add appropriate math delimiters
-    if (isComplexExpression) {
-      return `$$${normalized}$$`; // Block math
-    } else {
-      return `$${normalized}$`; // Inline math
-    }
+
+    // Wrap LaTeX commands with `$...$` so that remark-math/katex can render
+    // them correctly without converting the entire sentence into LaTeX.
+    const latexCommandRegex = /(\\[a-zA-Z]+(?:\{[^{}]*\})*(?:\{[^{}]*\})*)/g;
+
+    return normalized.replace(latexCommandRegex, (match) => `$${match}$`);
   };
 
   const markdownWithMath = normalizeLatexForMarkdown(children);
@@ -65,15 +49,18 @@ const MathRenderer: React.FC<MathRendererProps> = ({
   } catch (error) {
     console.warn('Math rendering error:', error);
     return (
-      <span className={`math-error ${className}`} style={{ 
-        color: '#e74c3c', 
-        fontFamily: 'monospace',
-        fontSize: '0.9em',
-        border: '1px solid #e74c3c',
-        padding: '2px 4px',
-        borderRadius: '3px',
-        backgroundColor: 'rgba(231, 76, 60, 0.1)'
-      }}>
+      <span
+        className={`math-error ${className}`}
+        style={{
+          color: '#e74c3c',
+          fontFamily: 'monospace',
+          fontSize: '0.9em',
+          border: '1px solid #e74c3c',
+          padding: '2px 4px',
+          borderRadius: '3px',
+          backgroundColor: 'rgba(231, 76, 60, 0.1)',
+        }}
+      >
         Math Error: {children}
       </span>
     );
