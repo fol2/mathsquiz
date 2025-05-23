@@ -447,10 +447,12 @@ body {
 
 /* Progress bar animations */
 .progress-bar {
+  position: relative;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
   background-size: 200% 200%;
   border-radius: 9999px;
   animation: gradient-shift 3s ease infinite;
+  overflow: hidden;
 }
 
 .progress-bar::after {
