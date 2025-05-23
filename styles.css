@@ -429,6 +429,337 @@ body {
   }
 }
 
+/* Enhanced Mobile Optimizations */
+@media (max-width: 768px) {
+  /* Better mobile layout and spacing */
+  .glass-card, .glass-card-strong {
+    margin: 0.5rem;
+    padding: 1rem;
+    border-radius: 1rem;
+  }
+  
+  /* Mobile-optimized button sizes */
+  .btn-primary, .btn-secondary {
+    min-height: 48px;
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+  }
+  
+  /* Improved input field for mobile */
+  .input-enhanced, input[type="number"], input[type="password"] {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+    min-height: 48px;
+    padding: 0.75rem 1rem;
+    -webkit-appearance: none;
+    border-radius: 0.75rem;
+  }
+  
+  /* Better touch targets */
+  button, .btn-primary, .btn-secondary {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Optimize stats grid for mobile */
+  .grid-cols-3 {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .grid-cols-3 > * {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Smooth scrolling for mobile */
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Better text selection on mobile */
+  * {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Allow text selection in input fields and content areas */
+  input, textarea, [contenteditable] {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+  
+  /* Prevent accidental zooming */
+  input, select, textarea {
+    transform: translateZ(0);
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  
+  /* Enhanced button interactions */
+  button, .btn-primary, .btn-secondary {
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+    touch-action: manipulation;
+  }
+  
+  /* Better focus indicators for touch */
+  .focus-enhanced:focus,
+  input:focus,
+  button:focus {
+    outline: 3px solid #3b82f6;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+  }
+}
+
+@media (max-width: 640px) {
+  /* Viewport optimizations for keyboard handling */
+  html {
+    height: 100%;
+    overflow-x: hidden;
+  }
+  
+  body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overflow-x: hidden;
+    position: relative;
+  }
+  
+  /* Container adjustments for mobile */
+  .max-w-3xl {
+    max-width: 100%;
+    margin: 0;
+    padding: 0.5rem;
+  }
+  
+  /* Question display optimization */
+  .text-xl.md\\:text-3xl {
+    font-size: 1.5rem !important;
+    line-height: 1.4;
+    padding: 1rem;
+  }
+  
+  /* Timer adjustments */
+  .text-2xl {
+    font-size: 1.5rem;
+  }
+  
+  /* Mobile keyboard handling */
+  .mobile-keyboard-adjust {
+    padding-bottom: env(keyboard-inset-height, 0px);
+    transition: padding-bottom 0.3s ease;
+  }
+  
+  /* Compact progress indicators */
+  .space-y-4 {
+    gap: 0.75rem;
+  }
+  
+  /* Better mobile modal positioning */
+  .fixed.inset-0 {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --blur-sm: 8px;
+    --blur-md: 12px;
+    --blur-lg: 16px;
+  }
+  
+  /* Ultra-compact for small screens */
+  .compact-spacing {
+    padding: 0.75rem;
+  }
+  
+  .compact-spacing-lg {
+    padding: 1rem;
+  }
+  
+  /* Single column stats for very small screens */
+  .grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Smaller text for tiny screens */
+  .text-xl {
+    font-size: 1.25rem;
+  }
+  
+  .text-lg {
+    font-size: 1.125rem;
+  }
+  
+  /* Improved button spacing */
+  .space-y-4 > * + * {
+    margin-top: 0.75rem;
+  }
+}
+
+/* Landscape mobile optimizations */
+@media (max-height: 600px) and (orientation: landscape) {
+  /* Compact layout for landscape mobile */
+  .glass-card, .glass-card-strong {
+    padding: 0.75rem;
+    margin: 0.25rem;
+  }
+  
+  .space-y-4 {
+    gap: 0.5rem;
+  }
+  
+  .space-y-6 {
+    gap: 0.75rem;
+  }
+  
+  /* Hide decorative elements in landscape */
+  .animate-float {
+    animation: none;
+    transform: none;
+  }
+  
+  /* Compact stats */
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.25rem;
+  }
+  
+  .grid-cols-3 > * {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .input-enhanced, input[type="number"], input[type="password"] {
+    font-size: 16px !important;
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+  }
+  
+  /* Fix for iOS viewport units */
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Android Chrome specific fixes */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  input[type="number"] {
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+  }
+  
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+/* Enhanced focus states for accessibility */
+.focus-enhanced:focus {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+/* Better error states */
+.error-state {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Loading state improvements */
+.loading-overlay {
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile viewport handler */
+.mobile-viewport-handler {
+  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Ultra-wide mobile screens */
+@media (max-width: 360px) {
+  .compact-spacing {
+    padding: 0.5rem;
+  }
+  
+  .compact-spacing-lg {
+    padding: 0.75rem;
+  }
+  
+  .text-lg {
+    font-size: 1rem;
+  }
+  
+  .text-xl {
+    font-size: 1.125rem;
+  }
+}
+
+/* Foldable and ultra-tall screens */
+@media (max-width: 768px) and (min-height: 800px) {
+  .glass-card, .glass-card-strong {
+    margin: 1rem 0.5rem;
+  }
+  
+  .space-y-4 {
+    gap: 1.5rem;
+  }
+}
+
+/* PWA safe area handling */
+@supports (padding: max(0px)) {
+  .mobile-viewport-handler {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Dark mode mobile optimizations */
+@media (prefers-color-scheme: dark) and (max-width: 768px) {
+  .glass-card, .glass-card-strong {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+  
+  .input-enhanced {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* High DPI mobile screens */
+@media (max-width: 768px) and (-webkit-min-device-pixel-ratio: 2) {
+  .glass-card, .glass-card-strong {
+    backdrop-filter: blur(8px);
+  }
+  
+  .text-shadow {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+}
+
 /* Print styles */
 @media print {
   .glass-card,
@@ -532,3 +863,4 @@ body {
 }
 
 /* UI improvements - force redeploy */
+

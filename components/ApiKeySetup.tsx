@@ -71,7 +71,7 @@ const ApiKeySetup: React.FC<ApiKeySetupProps> = ({ onComplete }) => {
             value={apiKey}
             onChange={(e) => setApiKeyInput(e.target.value)}
             placeholder="Enter your API key here..."
-            className="w-full p-3 text-gray-800 rounded-lg border-2 border-transparent focus:border-sky-400 focus:ring-2 focus:ring-sky-300 outline-none transition-all"
+            className="w-full p-4 text-lg bg-gray-800/90 text-white placeholder-gray-300 rounded-lg border-2 border-gray-600 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-300/50 outline-none transition-all duration-300 backdrop-blur-sm shadow-lg"
             disabled={isValidating}
           />
         </div>
