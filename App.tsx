@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { GameState, MathProblem, DifficultyLevel, ProblemType } from './types';
-import { generateProblem, hasValidApiKey } from './services/mathProblemService';
+import { generateProblem, hasValidApiKey, loadApiKeyFromStorage } from './services/mathProblemService';
 import { STARTING_LEVEL, MAX_LEVEL, STRIKES_TO_LEVEL_UP, INITIAL_TIME_PER_QUESTION, TIME_INCREMENT_PER_LEVEL, TOTAL_QUESTIONS, CORRECT_MESSAGES, INCORRECT_MESSAGES, LEVEL_UP_MESSAGES } from './constants';
 import StartScreen from './components/StartScreen';
 import GameScreen from './components/GameScreen';
@@ -12,7 +12,7 @@ import { useGameProgress } from './hooks/useGameProgress';
 
 const App = (): React.JSX.Element => {
   const [gameState, setGameState] = useState<GameState>(() => {
-    // Check if we have a valid API key on startup
+    loadApiKeyFromStorage();
     return hasValidApiKey() ? GameState.NOT_STARTED : GameState.API_KEY_SETUP;
   });
   const [currentLevel, setCurrentLevel] = useState<DifficultyLevel>(STARTING_LEVEL);
