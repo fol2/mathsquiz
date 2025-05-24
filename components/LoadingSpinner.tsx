@@ -11,9 +11,9 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   size = 'medium' 
 }) => {
   const sizeClasses = {
-    small: 'w-8 h-8',
-    medium: 'w-12 h-12',
-    large: 'w-16 h-16'
+    small: 'text-[2rem]',
+    medium: 'text-[3rem]',
+    large: 'text-[4rem]'
   };
 
   const containerClasses = {

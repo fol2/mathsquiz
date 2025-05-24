@@ -84,7 +84,9 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
           <div className="mb-6">
             <div className="flex justify-center mb-4">
               <div className="relative">
-                <GeniusIcon className="w-20 h-20 md:w-24 md:h-24 text-yellow-300 animate-float animate-pulse-glow" />
+                <GeniusIcon
+                  className="text-[5rem] md:text-[6rem] text-yellow-300 animate-float animate-pulse-glow"
+                />
                 <div className="absolute inset-0 bg-gradient-to-r from-yellow-300 via-pink-400 to-purple-500 rounded-full blur-xl opacity-30 animate-pulse"></div>
               </div>
             </div>
