@@ -57,8 +57,10 @@ const App = (): React.JSX.Element => {
   }, []);
 
   const computeTimerDuration = (level: DifficultyLevel): number => {
-    const increment = (TIME_AT_MAX_LEVEL - TIME_AT_LEVEL_ONE) / (MAX_LEVEL - 1);
-    return TIME_AT_LEVEL_ONE + (level - 1) * increment;
+    const scale = Math.log(level) / Math.log(MAX_LEVEL);
+    const rawDuration =
+      TIME_AT_LEVEL_ONE + (TIME_AT_MAX_LEVEL - TIME_AT_LEVEL_ONE) * scale;
+    return Math.round(rawDuration);
   };
 
 
