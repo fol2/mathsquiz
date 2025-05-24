@@ -3,8 +3,32 @@ import { DifficultyLevel } from './types.js';
 export const STARTING_LEVEL: DifficultyLevel = DifficultyLevel.LEVEL_1;
 export const MAX_LEVEL: DifficultyLevel = DifficultyLevel.LEVEL_20;
 export const STRIKES_TO_LEVEL_UP: number = 3;
-export const INITIAL_TIME_PER_QUESTION: number = 30; // seconds (Increased from 20)
-export const TIME_INCREMENT_PER_LEVEL: number = 3; // seconds (Was TIME_DECREMENT_PER_LEVEL, now time increases)
+export const TIME_PER_LEVEL: Record<DifficultyLevel, number> = {
+  [DifficultyLevel.LEVEL_1]: 15,
+  [DifficultyLevel.LEVEL_2]: 20,
+  [DifficultyLevel.LEVEL_3]: 25,
+  [DifficultyLevel.LEVEL_4]: 30,
+  [DifficultyLevel.LEVEL_5]: 40,
+  [DifficultyLevel.LEVEL_6]: 50,
+  [DifficultyLevel.LEVEL_7]: 60,
+  [DifficultyLevel.LEVEL_8]: 75,
+  [DifficultyLevel.LEVEL_9]: 90,
+  [DifficultyLevel.LEVEL_10]: 120,
+  [DifficultyLevel.LEVEL_11]: 150,
+  [DifficultyLevel.LEVEL_12]: 180,
+  [DifficultyLevel.LEVEL_13]: 210,
+  [DifficultyLevel.LEVEL_14]: 240,
+  [DifficultyLevel.LEVEL_15]: 300,
+  [DifficultyLevel.LEVEL_16]: 360,
+  [DifficultyLevel.LEVEL_17]: 420,
+  [DifficultyLevel.LEVEL_18]: 480,
+  [DifficultyLevel.LEVEL_19]: 540,
+  [DifficultyLevel.LEVEL_20]: 600,
+};
+
+export const TIME_AT_LEVEL_ONE: number = TIME_PER_LEVEL[DifficultyLevel.LEVEL_1];
+export const TIME_AT_MAX_LEVEL: number = TIME_PER_LEVEL[DifficultyLevel.LEVEL_20];
+export const INITIAL_TIME_PER_QUESTION: number = TIME_AT_LEVEL_ONE;
 export const TOTAL_QUESTIONS: number = 10;
 
 export const CORRECT_MESSAGES: string[] = [
