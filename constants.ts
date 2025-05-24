@@ -5,7 +5,6 @@ export const MAX_LEVEL: DifficultyLevel = DifficultyLevel.LEVEL_20;
 export const STRIKES_TO_LEVEL_UP: number = 3;
 export const TIME_AT_LEVEL_ONE: number = 15; // seconds
 export const TIME_AT_MAX_LEVEL: number = 600; // seconds
-export const REVERSE_LOG_BASE: number = 10;
 export const INITIAL_TIME_PER_QUESTION: number = TIME_AT_LEVEL_ONE;
 export const TOTAL_QUESTIONS: number = 10;
 

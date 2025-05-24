@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { GameState, MathProblem, DifficultyLevel, ProblemType } from './types';
 import { generateProblem, hasValidApiKey, loadApiKeyFromStorage } from './services/mathProblemService';
-import { STARTING_LEVEL, MAX_LEVEL, STRIKES_TO_LEVEL_UP, INITIAL_TIME_PER_QUESTION, TIME_AT_LEVEL_ONE, TIME_AT_MAX_LEVEL, REVERSE_LOG_BASE, TOTAL_QUESTIONS, CORRECT_MESSAGES, INCORRECT_MESSAGES, LEVEL_UP_MESSAGES } from './constants';
+import { STARTING_LEVEL, MAX_LEVEL, STRIKES_TO_LEVEL_UP, INITIAL_TIME_PER_QUESTION, TIME_AT_LEVEL_ONE, TIME_AT_MAX_LEVEL, TOTAL_QUESTIONS, CORRECT_MESSAGES, INCORRECT_MESSAGES, LEVEL_UP_MESSAGES } from './constants';
 import StartScreen from './components/StartScreen';
 import GameScreen from './components/GameScreen';
 import GameOverScreen from './components/GameOverScreen';
@@ -57,12 +57,8 @@ const App = (): React.JSX.Element => {
   }, []);
 
   const computeTimerDuration = (level: DifficultyLevel): number => {
-    const normalizedLevel = (level - 1) / (MAX_LEVEL - 1);
-    const reversedLog =
-      1 - Math.log(1 + (REVERSE_LOG_BASE - 1) * (1 - normalizedLevel)) / Math.log(REVERSE_LOG_BASE);
-    const duration =
-      TIME_AT_LEVEL_ONE + (TIME_AT_MAX_LEVEL - TIME_AT_LEVEL_ONE) * reversedLog;
-    return Math.round(duration);
+    const increment = (TIME_AT_MAX_LEVEL - TIME_AT_LEVEL_ONE) / (MAX_LEVEL - 1);
+    return TIME_AT_LEVEL_ONE + (level - 1) * increment;
   };
 
 
