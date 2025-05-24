@@ -311,7 +311,7 @@ const GameScreen: React.FC<GameScreenProps> = memo(({
           {/* Timer */}
           <div className={`flex items-center justify-center space-x-2 text-xl sm:text-2xl font-bold glass-card p-2 sm:p-3 rounded-xl mb-4 sm:mb-6 ${problem?.problemType === ProblemType.ERROR_GENERATING ? 'opacity-50' : ''}`}>
             <TimerIcon className={`w-6 h-6 sm:w-8 sm:h-8 ${problem?.problemType === ProblemType.ERROR_GENERATING ? 'text-gray-500' : 'text-red-400'} ${timeLeft <= 5 && timeLeft > 0 ? 'animate-pulse' : ''}`} />
-            <span className={getTimerClass()}>{timeLeft}s</span>
+            <span className={getTimerClass()}>{Math.ceil(timeLeft)}s</span>
             {timeLeft <= 5 && timeLeft > 0 && problem?.problemType !== ProblemType.ERROR_GENERATING && (
               <div className="text-xs sm:text-sm text-red-400 font-medium animate-bounce">HURRY!</div>
             )}

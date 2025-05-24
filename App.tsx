@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { GameState, MathProblem, DifficultyLevel, ProblemType } from './types';
 import { generateProblem, hasValidApiKey, loadApiKeyFromStorage } from './services/mathProblemService';
-import { STARTING_LEVEL, MAX_LEVEL, STRIKES_TO_LEVEL_UP, INITIAL_TIME_PER_QUESTION, TIME_INCREMENT_PER_LEVEL, TOTAL_QUESTIONS, CORRECT_MESSAGES, INCORRECT_MESSAGES, LEVEL_UP_MESSAGES } from './constants';
+import { STARTING_LEVEL, MAX_LEVEL, STRIKES_TO_LEVEL_UP, INITIAL_TIME_PER_QUESTION, TIME_AT_LEVEL_ONE, TIME_AT_MAX_LEVEL, TOTAL_QUESTIONS, CORRECT_MESSAGES, INCORRECT_MESSAGES, LEVEL_UP_MESSAGES } from './constants';
 import StartScreen from './components/StartScreen';
 import GameScreen from './components/GameScreen';
 import GameOverScreen from './components/GameOverScreen';
@@ -57,7 +57,10 @@ const App = (): React.JSX.Element => {
   }, []);
 
   const computeTimerDuration = (level: DifficultyLevel): number => {
-    return INITIAL_TIME_PER_QUESTION + (level - 1) * TIME_INCREMENT_PER_LEVEL;
+    const scale = Math.log(level) / Math.log(MAX_LEVEL);
+    const rawDuration =
+      TIME_AT_LEVEL_ONE + (TIME_AT_MAX_LEVEL - TIME_AT_LEVEL_ONE) * scale;
+    return Math.round(rawDuration);
   };
 
 
