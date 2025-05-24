@@ -202,7 +202,9 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ finalScore, finalLevel,
       <div className="text-center glass-card-strong rounded-3xl p-8 animate-bounce-in">
         <div className="flex justify-center mb-6">
           <div className="relative">
-            <TrophyIcon className={`w-20 h-20 ${isNewHighScore ? 'text-yellow-400 animate-pulse-glow' : 'text-indigo-300'}`} />
+            <TrophyIcon
+              className={`text-[5rem] ${isNewHighScore ? 'text-yellow-400 animate-pulse-glow' : 'text-indigo-300'}`}
+            />
             {isNewHighScore && (
               <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-full blur-2xl opacity-40 animate-pulse"></div>
             )}

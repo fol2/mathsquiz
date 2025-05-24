@@ -101,7 +101,9 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ level, onClose }) => {
         <div className="mb-6">
           <div className="flex justify-center mb-4">
             <div className="relative">
-              <TrophyIcon className="w-16 h-16 text-yellow-400 animate-float animate-pulse-glow" />
+              <TrophyIcon
+                className="text-[4rem] text-yellow-400 animate-float animate-pulse-glow"
+              />
               <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-full blur-xl opacity-40 animate-pulse"></div>
             </div>
           </div>
