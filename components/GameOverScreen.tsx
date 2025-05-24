@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DifficultyLevel } from '../types';
-import { DIFFICULTY_NAMES, TOTAL_QUESTIONS } from '../constants';
+import { DIFFICULTY_NAMES, TOTAL_QUESTIONS, MAX_LEVEL } from '../constants';
 import { TrophyIcon, RefreshIcon, StarIcon, SparklesIcon, TrendingUpIcon } from './Icons';
 
 // Import the GameProgress type from the hook to avoid conflicts
@@ -122,7 +122,7 @@ const PerformanceChart: React.FC<{
           <div className="w-full bg-gray-700/50 rounded-full h-3">
             <div
               className="bg-gradient-to-r from-yellow-400 to-orange-500 h-3 rounded-full transition-all duration-1000 ease-out"
-              style={{ width: `${(level / 5) * 100}%` }}
+              style={{ width: `${(level / MAX_LEVEL) * 100}%` }}
             />
           </div>
         </div>
