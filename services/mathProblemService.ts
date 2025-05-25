@@ -398,3 +398,11 @@ export const clearQuestionCache = (): void => {
   questionBatches.clear();
   saveQuestionBatchesToStorage();
 };
+
+// Remove the cached batch for a specific level
+export const clearBatchForLevel = (level: DifficultyLevel): void => {
+  if (questionBatches.has(level)) {
+    questionBatches.delete(level);
+  }
+  saveQuestionBatchesToStorage();
+};
