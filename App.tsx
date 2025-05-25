@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { GameState, MathProblem, DifficultyLevel, ProblemType } from './types';
-import { generateProblem, hasValidApiKey, loadApiKeyFromStorage } from './services/mathProblemService';
+import { generateProblem, hasValidApiKey, loadApiKeyFromStorage, clearQuestionCache, clearBatchForLevel } from './services/mathProblemService';
 import { STARTING_LEVEL, MAX_LEVEL, STRIKES_TO_LEVEL_UP, INITIAL_TIME_PER_QUESTION, TIME_PER_LEVEL, TOTAL_QUESTIONS, CORRECT_MESSAGES, INCORRECT_MESSAGES, LEVEL_UP_MESSAGES } from './constants';
 import StartScreen from './components/StartScreen';
 import GameScreen from './components/GameScreen';
@@ -171,7 +171,8 @@ const App = (): React.JSX.Element => {
           setCurrentLevel(prevLevel => {
             const newLevel = Math.min(MAX_LEVEL, prevLevel + 1) as DifficultyLevel;
             if (newLevel !== prevLevel) {
-                setNextProblemBuffer(null); 
+                clearBatchForLevel(newLevel);
+                setNextProblemBuffer(null);
             }
             return newLevel;
           });
@@ -223,6 +224,7 @@ const App = (): React.JSX.Element => {
 
 
   const startGame = async (level: DifficultyLevel = STARTING_LEVEL): Promise<void> => {
+    clearQuestionCache();
     setScore(0);
     setStrikes(0);
     setCurrentLevel(level);
@@ -242,6 +244,7 @@ const App = (): React.JSX.Element => {
   };
 
   const restartGame = (): void => {
+    clearQuestionCache();
     setGameState(GameState.NOT_STARTED);
     setCurrentProblem(null);
     setTimeLeft(INITIAL_TIME_PER_QUESTION); 
