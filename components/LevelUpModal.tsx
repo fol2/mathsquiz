@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { DifficultyLevel } from '../types';
-import { DIFFICULTY_NAMES } from '../constants';
+import { DIFFICULTY_NAMES, MAX_LEVEL } from '../constants';
 import { TrophyIcon, SparklesIcon, StarIcon } from './Icons';
 
 interface LevelUpModalProps {
@@ -72,6 +72,9 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ level, onClose }) => {
   const handleContinue = () => {
     onClose();
   };
+
+  const journeyLevels = Array.from({ length: MAX_LEVEL }, (_, i) => i + 1);
+  // Keep this in sync with MAX_LEVEL
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
@@ -197,11 +200,11 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ level, onClose }) => {
         {/* Progress Visualization */}
         <div className="glass-card p-3 rounded-xl mb-6 animate-scale-in" style={{ animationDelay: '1500ms' }}>
           <div className="text-sm text-indigo-200 mb-2">Your Journey</div>
-          <div className="flex justify-between items-center">
-            {[1, 2, 3, 4, 5].map((lvl) => (
+          <div className="grid grid-cols-5 sm:grid-cols-10 gap-2 items-center">
+            {journeyLevels.map((lvl) => (
               <div key={lvl} className="flex flex-col items-center">
                 <div
-                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 ${
+                  className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-500 ${
                     lvl <= level
                       ? 'bg-gradient-to-r from-green-400 to-blue-500 text-white animate-pulse'
                       : 'bg-gray-600 text-gray-400'
@@ -209,7 +212,7 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ level, onClose }) => {
                 >
                   {lvl}
                 </div>
-                <div className="text-xs text-indigo-300 mt-1">
+                <div className="text-[10px] text-indigo-300 mt-1">
                   {DIFFICULTY_NAMES[lvl as DifficultyLevel].slice(0, 4)}
                 </div>
               </div>
