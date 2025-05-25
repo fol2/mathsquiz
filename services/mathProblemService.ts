@@ -1,6 +1,7 @@
 import { GoogleGenAI, GenerateContentResponse } from '@google/genai';
 import { MathProblem, DifficultyLevel, ProblemType, QuestionBatch } from '../types.js';
 import { TOTAL_QUESTIONS } from '../constants.js';
+import { validateQuestionAnswer } from './answerValidator.js';
 
 // Storage key for persisting the API key in the browser
 const API_KEY_STORAGE_KEY = 'mathGeniusApiKey';
@@ -210,7 +211,10 @@ const generateErrorProblem = (level: DifficultyLevel, errorMessage: string = "Un
   };
 };
 
-const generateQuestionBatch = async (level: DifficultyLevel): Promise<QuestionBatch> => {
+const generateQuestionBatch = async (
+  level: DifficultyLevel,
+  attempt = 1
+): Promise<QuestionBatch> => {
   if (!ai) {
     throw new Error("AI client not initialized");
   }
@@ -288,20 +292,30 @@ Generate ${BATCH_SIZE} problems now:
     const parsed = JSON.parse(jsonStr);
     
     if (Array.isArray(parsed) && parsed.length === BATCH_SIZE) {
-      const questions: MathProblem[] = parsed.map((item, index) => {
+      const questions: MathProblem[] = [];
+      parsed.forEach((item, index) => {
         if (typeof item.questionText === 'string' && typeof item.answer === 'number') {
-          return {
+          if (!validateQuestionAnswer(item.questionText, item.answer)) {
+            console.error(`Validation failed for generated question: "${item.questionText}" expected ${item.answer}`);
+            return;
+          }
+          questions.push({
             id: `ai-batch-${level}-${Date.now()}-${index}`,
             questionText: item.questionText,
             answer: item.answer,
             difficulty: level,
             problemType: ProblemType.AI_GENERATED,
             hasLatex: item.hasLatex || false,
-          };
+          });
         } else {
           throw new Error(`Invalid question format at index ${index}`);
         }
       });
+
+      if (questions.length !== BATCH_SIZE && attempt < 3) {
+        console.error(`Discarded ${BATCH_SIZE - questions.length} invalid questions. Regenerating batch (attempt ${attempt + 1}).`);
+        return generateQuestionBatch(level, attempt + 1);
+      }
       
       return {
         questions,
